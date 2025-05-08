@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PasswordService } from './services/password.service';
 import { AuthService } from './auth.service';
+import { PermissionsGuard } from './guards/permissions.guard';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { AuthService } from './auth.service';
       inject: [ConfigService], // Inject ConfigService into the factory
     }),
   ],
-  providers: [JwtStrategy, PasswordService, AuthService],
+  providers: [JwtStrategy, PasswordService, AuthService, PermissionsGuard],
+  // Export guard? Usually not needed, it's used via @UseGuards
   exports: [PassportModule, JwtModule, PasswordService, AuthService],
 })
 export class AuthModule {}
