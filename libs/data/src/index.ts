@@ -1,5 +1,3 @@
-export * from './lib/libs';
-
 // Enums
 export * from './lib/enums/role-type.enum';
 export * from './lib/enums/task-status.enum';

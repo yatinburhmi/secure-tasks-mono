@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@secure-tasks-mono/data": ["libs/data/src/index.ts"]
+      "@secure-tasks-mono/data": ["libs/data/src/index.ts"],
+      "@secure-tasks-mono/database": ["libs/database/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
