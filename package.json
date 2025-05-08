@@ -7,7 +7,11 @@
     "build:api": "nx build api",
     "lint": "nx run-many --target=lint --all",
     "test": "nx run-many --target=test --all",
-    "graph": "nx graph"
+    "graph": "nx graph",
+    "db:typeorm": "pnpm exec typeorm -d libs/database/src/lib/data-source.config.ts",
+    "db:migration:generate": "pnpm db:typeorm migration:generate libs/database/src/migrations/InitialMigration",
+    "db:migration:run": "pnpm db:typeorm migration:run",
+    "db:migration:revert": "pnpm db:typeorm migration:revert"
   },
   "private": true,
   "dependencies": {
