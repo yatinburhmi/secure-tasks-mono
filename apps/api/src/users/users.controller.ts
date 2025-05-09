@@ -13,7 +13,12 @@ import { UsersBackendService } from '@secure-tasks-mono/users-backend';
 import { AuthGuard } from '@nestjs/passport'; // Standard JWT AuthGuard
 import { User } from '@secure-tasks-mono/database';
 import { CreateUserDto, UpdateUserDto } from '@secure-tasks-mono/data'; // Import DTOs
-import { AuthService } from '@secure-tasks-mono/auth'; // Import AuthService
+import {
+  AuthService,
+  PermissionsGuard,
+  RequirePermissions,
+  PERM_USER_READ,
+} from '@secure-tasks-mono/auth'; // Added Permissions imports
 
 // Define a response DTO for user creation, if desired, for clarity
 export class UserCreationResponseDto {
@@ -63,7 +68,8 @@ export class UsersController {
    * @returns A promise that resolves to an array of all users.
    */
   @Get()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @RequirePermissions(PERM_USER_READ)
   public async findAll(): Promise<User[]> {
     return this.usersBackendService.findAll();
   }

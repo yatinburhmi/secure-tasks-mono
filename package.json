@@ -11,7 +11,8 @@
     "db:typeorm": "pnpm exec dotenv -e ./.env -- cross-env USE_POSTGRES=true TS_NODE_PROJECT=tsconfig.base.json NODE_OPTIONS='-r tsconfig-paths/register' ts-node --compilerOptions '{\"module\":\"commonjs\", \"esModuleInterop\":true, \"moduleResolution\":\"node\", \"resolveJsonModule\":true}' ./node_modules/typeorm/cli.js -d libs/database/src/lib/data-source.config.ts",
     "db:migration:generate": "pnpm db:typeorm migration:generate libs/database/src/migrations/InitialMigration",
     "db:migration:run": "pnpm db:typeorm migration:run",
-    "db:migration:revert": "pnpm db:typeorm migration:revert"
+    "db:migration:revert": "pnpm db:typeorm migration:revert",
+    "build:all": "rm -rf dist && pnpm exec nx build data --skip-nx-cache && pnpm exec nx build database --skip-nx-cache && pnpm exec nx build auth --skip-nx-cache && pnpm exec nx build users-backend --skip-nx-cache && pnpm exec nx build organizations-backend --skip-nx-cache && pnpm exec nx build tasks-backend --skip-nx-cache && pnpm exec nx build api --skip-nx-cache"
   },
   "private": true,
   "dependencies": {

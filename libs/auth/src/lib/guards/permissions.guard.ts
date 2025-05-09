@@ -3,67 +3,63 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
 import { PERMISSIONS_KEY } from '../decorators/require-permissions.decorator';
-// Placeholder: Import RoleType from data library if checking roles here
-// import { RoleType } from '@secure-tasks-mono/data';
-// Placeholder: Import JwtPayload type
-// import { JwtPayload } from '../strategies/jwt.strategy';
+import { AuthService } from '../auth.service';
+import { JwtPayload } from '../strategies/jwt.strategy';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  private readonly logger = new Logger(PermissionsGuard.name);
 
-  canActivate(
-    context: ExecutionContext
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    // 1. Get the required permissions from the decorator
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly authService: AuthService
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,
-      [
-        context.getHandler(), // Method decorator
-        context.getClass(), // Class decorator
-      ]
+      [context.getHandler(), context.getClass()]
     );
 
-    // If no permissions are required, allow access
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
     }
 
-    // 2. Get the user object from the request (attached by JwtStrategy)
     const request = context.switchToHttp().getRequest();
-    const user = request.user as any; // Cast to 'any' for now, use JwtPayload later
+    const user = request.user as JwtPayload;
 
-    // If user is not attached (e.g., route wasn't protected by AuthGuard), deny access
-    if (!user) {
-      console.error(
-        'PermissionsGuard used without AuthGuard? User object not found.'
+    if (!user || !user.roleId) {
+      this.logger.warn(
+        'PermissionsGuard: User object or roleId not found on request. Ensure AuthGuard is active and JWT payload includes roleId.'
       );
-      throw new ForbiddenException('Access Denied');
+      throw new ForbiddenException(
+        'Access Denied: User authentication or role information is missing.'
+      );
     }
 
-    // 3. Placeholder for actual permission checking logic
-    // This is where you would:
-    //    - Get the user's actual permissions (e.g., based on user.roleId, possibly fetching from DB via a service)
-    //    - Check if the user's permissions include ALL requiredPermissions
-    console.warn(
-      'PermissionsGuard logic is a STUB. Needs implementation to check user permissions against required permissions.',
-      { required: requiredPermissions, userId: user?.sub }
+    const userActualPermissions = await this.authService.getPermissionsForRole(
+      user.roleId
     );
 
-    // For now, deny access if permissions are required but logic isn't implemented
-    // In a real implementation, this would return true/false based on the check
-    // return requiredPermissions.every((permission) => user.permissions?.includes(permission)); // Example structure
+    const hasAllRequiredPermissions = requiredPermissions.every((permission) =>
+      userActualPermissions.includes(permission)
+    );
 
-    // Temporarily allow access during development until logic is added
-    // REMOVE THIS FOR PRODUCTION or when logic is implemented
-    console.log('Temporarily allowing access in PermissionsGuard stub');
-    return true;
+    if (hasAllRequiredPermissions) {
+      return true;
+    }
 
-    // Or uncomment to deny by default until implemented:
-    // throw new ForbiddenException('You do not have the required permissions.');
+    this.logger.warn(
+      `Access Denied for user ${user.sub} (Role ID: ${
+        user.roleId
+      }). Required: [${requiredPermissions.join(
+        ', '
+      )}], Actual: [${userActualPermissions.join(', ')}]`
+    );
+    throw new ForbiddenException('You do not have the required permissions.');
   }
 }

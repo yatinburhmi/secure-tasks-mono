@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Task } from '@secure-tasks-mono/database';
+import { Task, User, Organization } from '@secure-tasks-mono/database';
 import {
   CreateTaskDto,
   UpdateTaskDto,
@@ -18,22 +18,28 @@ export class TasksBackendService {
   /**
    * Creates a new task.
    * @param createTaskDto - Data to create the task.
-   * @param creatorId - UUID of the user creating the task.
-   * @param organizationId - UUID of the organization the task belongs to.
+   * @param userId - UUID of the user creating the task.
    */
   public async createTask(
     createTaskDto: CreateTaskDto,
-    creatorId: string
-    // organizationId is part of CreateTaskDto, ensure it is used for validation/scoping
+    userId: string
   ): Promise<Task> {
-    // Basic validation (existence of org, assignee if provided) should happen here
-    // For now, direct creation:
-    const task = this.taskRepository.create({
-      ...createTaskDto,
-      creatorId,
-      status: createTaskDto.status || TaskStatus.PENDING, // Example default if not in DTO
-    });
-    return this.taskRepository.save(task);
+    const { organizationId, assigneeId, status, ...coreTaskProperties } =
+      createTaskDto;
+    console.log('Creating task with userId:', userId);
+    const taskDataForCreate: Partial<Task> = {
+      ...coreTaskProperties,
+      creator: { id: userId } as User,
+      organization: { id: organizationId } as Organization,
+      status: status || TaskStatus.PENDING,
+    };
+
+    if (assigneeId) {
+      taskDataForCreate.assignee = { id: assigneeId } as User;
+    }
+
+    const taskEntityInstance = this.taskRepository.create(taskDataForCreate);
+    return this.taskRepository.save(taskEntityInstance);
   }
 
   /**

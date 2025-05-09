@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RolePermission, Permission } from '@secure-tasks-mono/database';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PasswordService } from './services/password.service';
 import { AuthService } from './auth.service';
@@ -21,6 +23,7 @@ import { PermissionsGuard } from './guards/permissions.guard';
       }),
       inject: [ConfigService], // Inject ConfigService into the factory
     }),
+    TypeOrmModule.forFeature([RolePermission, Permission]),
   ],
   providers: [JwtStrategy, PasswordService, AuthService, PermissionsGuard],
   // Export guard? Usually not needed, it's used via @UseGuards

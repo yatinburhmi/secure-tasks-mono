@@ -10,87 +10,84 @@ import {
   UseGuards,
   HttpCode,
   ParseUUIDPipe,
-  Req, // To access the request object for req.user
+  Req,
   ForbiddenException,
 } from '@nestjs/common';
 import { TasksBackendService } from '@secure-tasks-mono/tasks-backend';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTaskDto, UpdateTaskDto, TaskDto } from '@secure-tasks-mono/data';
-import { User as UserEntity } from '@secure-tasks-mono/database'; // For typehinting req.user
+// User as UserEntity is not strictly needed if JwtPayload contains all necessary fields like organizationId
+// import { User as UserEntity } from '@secure-tasks-mono/database';
+import {
+  PermissionsGuard,
+  RequirePermissions,
+  PERM_TASK_CREATE,
+  JwtPayload, // Imported JwtPayload
+} from '@secure-tasks-mono/auth';
 
-// Define a type for the authenticated user object on the request
-interface AuthenticatedRequest extends Request {
-  user: UserEntity & { id: string; organizationId: string; roleId: number };
-}
+// Removed AuthenticatedRequest interface, will use JwtPayload directly for req.user
 
 @Controller('tasks')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), PermissionsGuard)
 export class TasksController {
   constructor(private readonly tasksBackendService: TasksBackendService) {}
 
   @Post()
   @HttpCode(201)
+  @RequirePermissions(PERM_TASK_CREATE)
   public async createTask(
     @Body() createTaskDto: CreateTaskDto,
-    @Req() req: AuthenticatedRequest
+    @Req() req: { user: JwtPayload } // Typed req.user as JwtPayload
   ): Promise<TaskDto> {
-    // Returning TaskDto
-    const user = req.user;
+    const user = req.user; // user is JwtPayload
 
-    // Ensure task is created within the user's organization
     if (createTaskDto.organizationId !== user.organizationId) {
       throw new ForbiddenException(
         'You can only create tasks for your own organization.'
       );
     }
 
-    // The service's createTask method expects creatorId as a separate param
+    console.log('Creating task with userId:', user.sub);
+
     const createdTask = await this.tasksBackendService.createTask(
       createTaskDto,
-      user.id
+      user.sub // Used user.sub for userId
     );
-    // TODO: Map entity to TaskDto if they are not identical or if selective field exposure is needed.
-    // For now, assuming direct compatibility or implicit transformation by NestJS.
-    return createdTask as unknown as TaskDto; // Cast if service returns entity
+    return createdTask as unknown as TaskDto;
   }
 
   @Get()
   public async findAllTasks(
-    @Req() req: AuthenticatedRequest
-    // @Query() findAllTasksQueryDto: FindAllTasksQueryDto, // Placeholder for future query DTO
+    @Req() req: { user: JwtPayload } // Typed req.user as JwtPayload
   ): Promise<TaskDto[]> {
-    const user = req.user;
-    // The service's findAllTasks expects organizationId
+    const user = req.user; // user is JwtPayload
     const tasks = await this.tasksBackendService.findAllTasks(
       user.organizationId
-      // findAllTasksQueryDto,
     );
-    return tasks as unknown as TaskDto[]; // Cast if service returns entities
+    return tasks as unknown as TaskDto[];
   }
 
   @Get(':id')
   public async findTaskById(
     @Param('id', ParseUUIDPipe) id: string,
-    @Req() req: AuthenticatedRequest
+    @Req() req: { user: JwtPayload } // Typed req.user as JwtPayload
   ): Promise<TaskDto> {
-    const user = req.user;
-    // Service method ensures task belongs to the organization
+    const user = req.user; // user is JwtPayload
     const task = await this.tasksBackendService.findTaskById(
       id,
       user.organizationId
     );
-    return task as unknown as TaskDto; // Cast if service returns entity
+    return task as unknown as TaskDto;
   }
 
   @Patch(':id')
   public async updateTask(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTaskDto: UpdateTaskDto,
-    @Req() req: AuthenticatedRequest
+    @Req() req: { user: JwtPayload } // Typed req.user as JwtPayload
   ): Promise<TaskDto> {
-    const user = req.user;
+    const user = req.user; // user is JwtPayload
 
-    // If organizationId is part of updateTaskDto, validate it (or prevent its change through this endpoint)
     if (
       updateTaskDto.organizationId &&
       updateTaskDto.organizationId !== user.organizationId
@@ -99,28 +96,26 @@ export class TasksController {
         'Cannot change the organization of a task or assign to a different organization.'
       );
     }
-    // Ensure the update DTO doesn't try to change the organization ID if it's not allowed
     const { organizationId, ...restOfUpdateDto } = updateTaskDto;
     if (organizationId && organizationId !== user.organizationId) {
-      // This check is somewhat redundant given the above, but good for explicit denial
       throw new ForbiddenException('Task organization cannot be changed.');
     }
 
     const updatedTask = await this.tasksBackendService.updateTask(
       id,
-      restOfUpdateDto as UpdateTaskDto, // Pass DTO without orgId if it was present
+      restOfUpdateDto as UpdateTaskDto,
       user.organizationId
     );
-    return updatedTask as unknown as TaskDto; // Cast if service returns entity
+    return updatedTask as unknown as TaskDto;
   }
 
   @Delete(':id')
   @HttpCode(204)
   public async deleteTask(
     @Param('id', ParseUUIDPipe) id: string,
-    @Req() req: AuthenticatedRequest
+    @Req() req: { user: JwtPayload } // Typed req.user as JwtPayload
   ): Promise<void> {
-    const user = req.user;
+    const user = req.user; // user is JwtPayload
     await this.tasksBackendService.deleteTask(id, user.organizationId);
   }
 }
