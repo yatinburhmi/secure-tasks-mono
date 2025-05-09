@@ -6,8 +6,8 @@
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
   "dependencies": {
-    "@secure-tasks-mono/libs": "*",
     "tslib": "^2.3.0",
-    "typeorm": "^0.3.23"
+    "typeorm": "^0.3.23",
+    "reflect-metadata": "^0.1.13"
   }
 }
