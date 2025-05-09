@@ -27,6 +27,12 @@ export class Task {
   @Column({ nullable: true })
   category?: string;
 
+  @Column({ type: 'int', nullable: true })
+  priority?: number;
+
+  @Column({ type: 'simple-array', nullable: true })
+  tags?: string[];
+
   @Column({ type: 'timestamp with time zone', nullable: true })
   dueDate?: Date;
 

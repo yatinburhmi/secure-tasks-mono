@@ -1,0 +1,19 @@
+{
+  "name": "tasks-backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/tasks-backend/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/tasks-backend",
+        "main": "libs/tasks-backend/src/index.ts",
+        "tsConfig": "libs/tasks-backend/tsconfig.lib.json",
+        "assets": ["libs/tasks-backend/*.md"]
+      }
+    }
+  }
+}
