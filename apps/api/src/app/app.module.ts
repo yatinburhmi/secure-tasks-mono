@@ -5,10 +5,8 @@ import { AppDataSourceOptions } from '@secure-tasks-mono/database';
 import { AuthModule } from '@secure-tasks-mono/auth';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersBackendModule } from '@secure-tasks-mono/users-backend';
-import { UsersController } from '../users/users.controller';
-import { OrganizationsBackendModule } from '@secure-tasks-mono/organizations-backend';
-import { OrganizationsController } from '../organizations/organizations.controller';
+import { UsersModule } from '../users/users.module';
+import { OrganizationsModule } from '../organizations/organizations.module';
 
 @Module({
   imports: [
@@ -24,10 +22,10 @@ import { OrganizationsController } from '../organizations/organizations.controll
       inject: [],
     }),
     AuthModule,
-    UsersBackendModule,
-    OrganizationsBackendModule,
+    UsersModule,
+    OrganizationsModule,
   ],
-  controllers: [AppController, UsersController, OrganizationsController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
