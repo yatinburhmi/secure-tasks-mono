@@ -1,27 +1,33 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppDataSourceOptions } from '@secure-tasks-mono/database';
 import { AuthModule } from '@secure-tasks-mono/auth';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UsersBackendModule } from '@secure-tasks-mono/users-backend';
+import { UsersController } from '../users/users.controller';
+import { OrganizationsBackendModule } from '@secure-tasks-mono/organizations-backend';
+import { OrganizationsController } from '../organizations/organizations.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, // Makes ConfigModule available globally
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule], // Ensure ConfigModule is imported if ConfigService is used here
-      useFactory: (): TypeOrmModuleOptions => ({
-        ...(AppDataSourceOptions as any), // Cast to any to resolve immediate type issues, then spread
-        autoLoadEntities: true, // Add NestJS specific option for convenience
-      }),
-      // inject: [ConfigService], // Not needed if useFactory doesn't directly depend on ConfigService
+      useFactory: (): TypeOrmModuleOptions => {
+        const options: TypeOrmModuleOptions = {
+          ...(AppDataSourceOptions as any),
+          autoLoadEntities: true,
+        };
+        return options;
+      },
+      inject: [],
     }),
     AuthModule,
+    UsersBackendModule,
+    OrganizationsBackendModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UsersController, OrganizationsController],
   providers: [AppService],
 })
 export class AppModule {}
