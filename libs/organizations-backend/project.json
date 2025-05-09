@@ -1,0 +1,19 @@
+{
+  "name": "organizations-backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/organizations-backend/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/organizations-backend",
+        "main": "libs/organizations-backend/src/index.ts",
+        "tsConfig": "libs/organizations-backend/tsconfig.lib.json",
+        "assets": ["libs/organizations-backend/*.md"]
+      }
+    }
+  }
+}

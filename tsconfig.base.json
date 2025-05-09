@@ -17,7 +17,11 @@
     "paths": {
       "@secure-tasks-mono/auth": ["libs/auth/src/index.ts"],
       "@secure-tasks-mono/data": ["libs/data/src/index.ts"],
-      "@secure-tasks-mono/database": ["libs/database/src/index.ts"]
+      "@secure-tasks-mono/database": ["libs/database/src/index.ts"],
+      "@secure-tasks-mono/organizations-backend": [
+        "libs/organizations-backend/src/index.ts"
+      ],
+      "@secure-tasks-mono/users-backend": ["libs/users-backend/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
