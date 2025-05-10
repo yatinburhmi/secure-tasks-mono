@@ -25,6 +25,7 @@
         "dist/libs/organizations-backend"
       ],
       "@secure-tasks-mono/tasks-backend": ["libs/tasks-backend/src/index.ts"],
+      "@secure-tasks-mono/ui-angular": ["libs/ui-angular/src/index.ts"],
       "@secure-tasks-mono/users-backend": ["dist/libs/users-backend"]
     }
   },
