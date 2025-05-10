@@ -22,6 +22,8 @@ import {
   PermissionsGuard,
   RequirePermissions,
   PERM_TASK_CREATE,
+  PERM_TASK_UPDATE,
+  PERM_TASK_DELETE,
   JwtPayload, // Imported JwtPayload
 } from '@secure-tasks-mono/auth';
 
@@ -81,6 +83,7 @@ export class TasksController {
   }
 
   @Patch(':id')
+  @RequirePermissions(PERM_TASK_UPDATE)
   public async updateTask(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTaskDto: UpdateTaskDto,
@@ -104,18 +107,24 @@ export class TasksController {
     const updatedTask = await this.tasksBackendService.updateTask(
       id,
       restOfUpdateDto as UpdateTaskDto,
-      user.organizationId
+      user.organizationId,
+      user.sub
     );
     return updatedTask as unknown as TaskDto;
   }
 
   @Delete(':id')
   @HttpCode(204)
+  @RequirePermissions(PERM_TASK_DELETE)
   public async deleteTask(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: { user: JwtPayload } // Typed req.user as JwtPayload
   ): Promise<void> {
     const user = req.user; // user is JwtPayload
-    await this.tasksBackendService.deleteTask(id, user.organizationId);
+    await this.tasksBackendService.deleteTask(
+      id,
+      user.organizationId,
+      user.sub
+    );
   }
 }

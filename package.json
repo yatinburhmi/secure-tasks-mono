@@ -12,7 +12,7 @@
     "db:migration:generate": "pnpm db:typeorm migration:generate libs/database/src/migrations/InitialMigration",
     "db:migration:run": "pnpm db:typeorm migration:run",
     "db:migration:revert": "pnpm db:typeorm migration:revert",
-    "build:all": "rm -rf dist && pnpm exec nx build data --skip-nx-cache && pnpm exec nx build database --skip-nx-cache && pnpm exec nx build auth --skip-nx-cache && pnpm exec nx build users-backend --skip-nx-cache && pnpm exec nx build organizations-backend --skip-nx-cache && pnpm exec nx build tasks-backend --skip-nx-cache && pnpm exec nx build api --skip-nx-cache"
+    "build:all": "rm -rf dist && pnpm exec nx build data --skip-nx-cache && pnpm exec nx build database --skip-nx-cache && pnpm exec nx build auth --skip-nx-cache && pnpm exec nx build users-backend --skip-nx-cache && pnpm exec nx build organizations-backend --skip-nx-cache && pnpm exec nx build audit-log-backend --skip-nx-cache && pnpm exec nx build tasks-backend --skip-nx-cache && pnpm exec nx build audit-log-backend --skip-nx-cache && pnpm exec nx build api --skip-nx-cache"
   },
   "private": true,
   "dependencies": {

@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { UsersModule } from '../users/users.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { TasksModule } from '../tasks/tasks.module';
+import { AuditLogApiModule } from '../audit-log/audit-log.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TasksModule } from '../tasks/tasks.module';
     UsersModule,
     OrganizationsModule,
     TasksModule,
+    AuditLogApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
