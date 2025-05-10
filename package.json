@@ -39,6 +39,7 @@
     "@ngrx/effects": "^19.1.0",
     "@ngrx/entity": "^19.1.0",
     "@ngrx/store": "^19.1.0",
+    "@ngrx/store-devtools": "^19.1.0",
     "@types/bcryptjs": "^3.0.0",
     "axios": "^1.6.0",
     "bcryptjs": "^3.0.2",
