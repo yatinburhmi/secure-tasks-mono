@@ -5,7 +5,6 @@ import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
-import { StateNgrxModule } from '@secure-tasks-mono/state-ngrx'; // RESTORED
 
 // REMOVED direct StoreModule, EffectsModule, and effects imports
 
@@ -16,7 +15,6 @@ import { StateNgrxModule } from '@secure-tasks-mono/state-ngrx'; // RESTORED
     RouterModule.forRoot(appRoutes),
     DashboardComponent,
     LoginComponent,
-    StateNgrxModule, // RESTORED
     // REMOVED StoreModule.forRoot and EffectsModule.forRoot from here
   ],
   providers: [],
