@@ -1,0 +1,19 @@
+{
+  "name": "audit-log-backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/audit-log-backend/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/audit-log-backend",
+        "main": "libs/audit-log-backend/src/index.ts",
+        "tsConfig": "libs/audit-log-backend/tsconfig.lib.json",
+        "assets": ["libs/audit-log-backend/*.md"]
+      }
+    }
+  }
+}

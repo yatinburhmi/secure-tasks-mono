@@ -26,7 +26,6 @@ export class TasksBackendService {
   ): Promise<Task> {
     const { organizationId, assigneeId, status, ...coreTaskProperties } =
       createTaskDto;
-    console.log('Creating task with userId:', userId);
     const taskDataForCreate: Partial<Task> = {
       ...coreTaskProperties,
       creator: { id: userId } as User,

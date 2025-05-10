@@ -7,10 +7,19 @@ import { Role } from './entities/index';
 import { Permission } from './entities/index';
 import { Task } from './entities/index';
 import { RolePermission } from './entities/index';
+import { AuditLogEntity } from './entities/index';
 
 // Helper function to get base options common to both SQLite and PostgreSQL
 const getBaseOptions = (): Partial<DataSourceOptions> => ({
-  entities: [Organization, User, Role, Permission, Task, RolePermission],
+  entities: [
+    Organization,
+    User,
+    Role,
+    Permission,
+    Task,
+    RolePermission,
+    AuditLogEntity,
+  ],
   // The path should correctly point from the compiled output (e.g., dist/libs/database/src/lib/data-source.js)
   // back to the source migrations directory (e.g., libs/database/src/migrations).
   migrations: [path.join(__dirname, '../migrations/*{.ts,.js}')], // Corrected path to libs/database/src/migrations, // Corrected path

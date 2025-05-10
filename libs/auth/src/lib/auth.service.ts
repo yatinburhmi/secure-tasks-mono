@@ -16,9 +16,8 @@ export class AuthService {
     @InjectRepository(RolePermission)
     private readonly rolePermissionRepository: Repository<RolePermission>,
     @InjectRepository(Permission)
-    private readonly permissionRepository: Repository<Permission>
-  ) // Placeholder: Inject UserService from libs/users-backend later // private readonly usersService: UsersService,
-  {}
+    private readonly permissionRepository: Repository<Permission> // Placeholder: Inject UserService from libs/users-backend later // private readonly usersService: UsersService,
+  ) {}
 
   /**
    * Validates a user based on email and password.

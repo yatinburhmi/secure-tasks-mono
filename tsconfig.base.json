@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@secure-tasks-mono/audit-log-backend": [
+        "libs/audit-log-backend/src/index.ts"
+      ],
       "@secure-tasks-mono/auth": ["dist/libs/auth"],
       "@secure-tasks-mono/data": ["dist/libs/data"],
       "@secure-tasks-mono/database": ["dist/libs/database"],
