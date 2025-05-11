@@ -11,3 +11,4 @@ export * from './lib/dto/permission.dto';
 export * from './lib/dto/audit-log.dto';
 export * from './lib/dto/login-user.dto';
 export * from './lib/dto/switch-role.dto';
+export * from './lib/dto/find-all-tasks-query.dto';

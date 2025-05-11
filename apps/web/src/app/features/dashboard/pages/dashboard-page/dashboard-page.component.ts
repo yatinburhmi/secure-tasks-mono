@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   TaskDto,
@@ -10,10 +10,11 @@ import {
 } from '@secure-tasks-mono/data';
 import { TaskCardComponent } from '../../components/task-card/task-card.component';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { TaskFormComponent } from '../../../../components/tasks/task-form/task-form.component';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription, combineLatest } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, tap } from 'rxjs/operators';
 import { RootState } from '../../../../store';
 import * as TasksActions from '../../../../store/tasks/tasks.actions';
 import * as UsersActions from '../../../../store/users/users.actions';
@@ -36,7 +37,13 @@ import {
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, TaskCardComponent, ModalComponent, TaskFormComponent],
+  imports: [
+    CommonModule,
+    TaskCardComponent,
+    ModalComponent,
+    TaskFormComponent,
+    ConfirmationDialogComponent,
+  ],
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
 })
@@ -60,6 +67,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   isTaskModalOpen = false;
   modalMode: 'create' | 'edit' = 'create';
   taskToEdit: TaskDto | null = null;
+  taskToDelete: TaskDto | null = null;
   assignableUsers$!: Observable<UserDto[]>;
   isLoadingAssignableUsers$!: Observable<boolean>;
   isTaskFormLoading$!: Observable<boolean>;
@@ -67,6 +75,12 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   private currentOrganizationId: string | null = null;
   private currentUserId: string | null = null;
   private subscriptions = new Subscription();
+
+  // Add a property to control New Task button visibility
+  public canCreateTasks = false;
+
+  @ViewChild(ConfirmationDialogComponent)
+  private deleteConfirmDialog!: ConfirmationDialogComponent;
 
   constructor(private store: Store<RootState>) {}
 
@@ -107,10 +121,18 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     const userSubscription = this.store
       .pipe(
         select(selectCurrentUser),
-        filter((user): user is UserDto => !!user)
+        // Add tap for debugging if needed
+        // tap(user => console.log('[DashboardPage] Current user from store:', user)),
+        filter((user): user is UserDto => !!user) // Ensure user is not null
       )
       .subscribe((user: UserDto) => {
         this.currentUserId = user.id;
+        // Set canCreateTasks based on roleId
+        if (typeof user.roleId === 'number') {
+          this.canCreateTasks = user.roleId === 1 || user.roleId === 2; // Owner or Admin
+        } else {
+          this.canCreateTasks = false; // Default if roleId is missing or not a number
+        }
       });
     this.subscriptions.add(userSubscription);
 
@@ -230,5 +252,41 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   handleTaskFormCancelled(): void {
     this.closeTaskModal();
+  }
+
+  public requestTaskDelete(task: TaskDto): void {
+    if (!task || !task.id) {
+      console.error('Task or Task ID is missing, cannot request deletion.');
+      return;
+    }
+    this.taskToDelete = task;
+    if (this.deleteConfirmDialog) {
+      this.deleteConfirmDialog.title = 'Confirm Deletion';
+      this.deleteConfirmDialog.message = `Are you sure you want to delete the task "${task.title}"?\nThis action cannot be undone.`;
+      this.deleteConfirmDialog.confirmButtonText = 'Delete';
+      this.deleteConfirmDialog.confirmButtonClass =
+        'bg-red-600 hover:bg-red-700 focus:ring-red-500';
+      this.deleteConfirmDialog.show();
+    } else {
+      console.error('Delete confirmation dialog not available.');
+      if (window.confirm(`Are you sure you want to delete "${task.title}"?`)) {
+        this.confirmTaskDelete();
+      }
+    }
+  }
+
+  public confirmTaskDelete(): void {
+    if (this.taskToDelete && this.taskToDelete.id) {
+      this.store.dispatch(
+        TasksActions.deleteTask({ id: this.taskToDelete.id })
+      );
+    } else {
+      console.error('No task selected for deletion or task ID is missing.');
+    }
+    this.taskToDelete = null;
+  }
+
+  public cancelTaskDelete(): void {
+    this.taskToDelete = null;
   }
 }

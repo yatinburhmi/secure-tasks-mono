@@ -1,0 +1,33 @@
+<div *ngIf="isVisible"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 backdrop-blur-sm transition-opacity duration-300 ease-in-out"
+     role="dialog" 
+     aria-modal="true"
+     [attr.aria-labelledby]="dialogTitleId"
+     tabindex="-1" 
+     (click)="onCancel()"
+     (keydown.escape)="onCancel()">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md transform transition-all duration-300 ease-in-out scale-100"
+       role="document" 
+       (click)="$event.stopPropagation()"
+       (keydown)="$event.stopPropagation()">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4" [id]="dialogTitleId">{{ title }}</h3>
+    <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 whitespace-pre-wrap">{{ message }}</p>
+    <div class="flex justify-end space-x-3">
+      <button (click)="onCancel()"
+              type="button"
+              tabindex="0"
+              [attr.aria-label]="cancelButtonText"
+              class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+        {{ cancelButtonText }}
+      </button>
+      <button (click)="onConfirm()"
+              type="button"
+              tabindex="0"
+              [attr.aria-label]="confirmButtonText"
+              [ngClass]="confirmButtonClass"
+              class="px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+        {{ confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div> 

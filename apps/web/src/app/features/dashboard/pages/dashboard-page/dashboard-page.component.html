@@ -27,7 +27,8 @@
         </button>
       </div>
       <!-- New Task Button -->
-      <button type="button"
+      <button *ngIf="canCreateTasks" 
+              type="button"
               (click)="openCreateTaskModal()"
               class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:bg-purple-500 dark:hover:bg-purple-600 dark:focus:ring-offset-gray-800">
         <svg class="w-5 h-5 inline-block mr-1 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v4h4a1 1 0 110 2h-4v4a1 1 0 11-2 0v-4H5a1 1 0 110-2h4V4a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
@@ -60,7 +61,12 @@
     <div *ngIf="currentView === 'list'; else boardView">
       <!-- Task List View -->
       <div *ngIf="listTasks.length > 0; else noListTasks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <app-task-card *ngFor="let task of listTasks" [task]="task" [viewContext]="'list'" (editClicked)="openEditTaskModal($event)"></app-task-card>
+        <app-task-card 
+          *ngFor="let task of listTasks" 
+          [task]="task" 
+          [viewContext]="'list'" 
+          (editClicked)="openEditTaskModal($event)"
+          (deleteRequested)="requestTaskDelete($event)"></app-task-card>
       </div>
       <ng-template #noListTasks>
         <div class="text-center text-gray-500 dark:text-gray-400 py-10">
@@ -82,7 +88,12 @@
             <div *ngIf="pendingTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No pending tasks.
             </div>
-            <app-task-card *ngFor="let task of pendingTasks" [task]="task" [viewContext]="'board'" (editClicked)="openEditTaskModal($event)"></app-task-card>
+            <app-task-card 
+              *ngFor="let task of pendingTasks" 
+              [task]="task" 
+              [viewContext]="'board'" 
+              (editClicked)="openEditTaskModal($event)"
+              (deleteRequested)="requestTaskDelete($event)"></app-task-card>
           </div>
         </div>
 
@@ -93,7 +104,12 @@
             <div *ngIf="inProgressTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks in progress.
             </div>
-            <app-task-card *ngFor="let task of inProgressTasks" [task]="task" [viewContext]="'board'" (editClicked)="openEditTaskModal($event)"></app-task-card>
+            <app-task-card 
+              *ngFor="let task of inProgressTasks" 
+              [task]="task" 
+              [viewContext]="'board'" 
+              (editClicked)="openEditTaskModal($event)"
+              (deleteRequested)="requestTaskDelete($event)"></app-task-card>
           </div>
         </div>
 
@@ -104,7 +120,12 @@
             <div *ngIf="doneTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks done.
             </div>
-            <app-task-card *ngFor="let task of doneTasks" [task]="task" [viewContext]="'board'" (editClicked)="openEditTaskModal($event)"></app-task-card>
+            <app-task-card 
+              *ngFor="let task of doneTasks" 
+              [task]="task" 
+              [viewContext]="'board'" 
+              (editClicked)="openEditTaskModal($event)"
+              (deleteRequested)="requestTaskDelete($event)"></app-task-card>
           </div>
         </div>
       </div>
@@ -125,4 +146,10 @@
     (saveTask)="handleTaskFormSave($event)" 
     (formCancelled)="handleTaskFormCancelled()"
   ></app-task-form>
-</app-modal> 
+</app-modal>
+
+<!-- Confirmation Dialog for Deletion -->
+<app-confirmation-dialog 
+  (confirmed)="confirmTaskDelete()"
+  (cancelled)="cancelTaskDelete()">
+</app-confirmation-dialog> 

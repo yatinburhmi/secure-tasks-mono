@@ -6,6 +6,7 @@ import {
   CreateTaskDto,
   UpdateTaskDto,
   TaskStatus,
+  FindAllTasksFiltersDto,
 } from '@secure-tasks-mono/data';
 import {
   AuditLogService,
@@ -97,12 +98,35 @@ export class TasksBackendService {
   public async findAllTasks(
     organizationId: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    filters?: any // Define a proper filter DTO later
+    filters?: FindAllTasksFiltersDto // Use the new DTO
   ): Promise<Task[]> {
+    // Construct the where clause dynamically
+    const whereClause: any = { organizationId }; // Start with organizationId
+
+    if (filters?.assigneeId) {
+      whereClause.assigneeId = filters.assigneeId; // Add assigneeId if present
+    }
+
     return this.taskRepository.find({
-      where: { organizationId },
+      where: whereClause, // Use the dynamically constructed where clause
       // Add relations to load if needed: 'assignee', 'creator', 'organization'
       // Add order by, e.g., { createdAt: 'DESC' }
+      relations: ['assignee', 'creator', 'organization'], // Eager load relations
+      order: { createdAt: 'DESC' }, // Default ordering
+    });
+  }
+
+  /**
+   * Finds all tasks across all organizations. Intended for Owner-level access.
+   */
+  public async findAllTasksAcrossOrganizations(): Promise<Task[]> {
+    this.logger.debug(
+      'Fetching all tasks across all organizations for Owner role'
+    );
+    return this.taskRepository.find({
+      // No organizationId filter here
+      relations: ['assignee', 'creator', 'organization'], // Eager load relations
+      order: { createdAt: 'DESC' }, // Default ordering
     });
   }
 

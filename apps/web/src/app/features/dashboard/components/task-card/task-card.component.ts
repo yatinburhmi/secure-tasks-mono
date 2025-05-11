@@ -1,6 +1,20 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { TaskDto, TaskStatus } from '@secure-tasks-mono/data';
+import { TaskDto, TaskStatus, UserDto } from '@secure-tasks-mono/data';
+import { Store, select } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+
+// Import your actual RootState and the selector
+import { RootState } from '../../../../store';
+import { selectCurrentUser } from '../../../../store/auth/auth.selectors';
 
 @Component({
   selector: 'app-task-card',
@@ -9,7 +23,7 @@ import { TaskDto, TaskStatus } from '@secure-tasks-mono/data';
   templateUrl: './task-card.component.html',
   styleUrls: ['./task-card.component.scss'],
 })
-export class TaskCardComponent {
+export class TaskCardComponent implements OnInit, OnDestroy {
   @Input({ required: true }) task!: TaskDto;
   @Input() viewContext: 'list' | 'board' = 'board';
   @Output() statusChanged = new EventEmitter<{
@@ -17,9 +31,48 @@ export class TaskCardComponent {
     newStatus: TaskStatus;
   }>();
   @Output() editClicked = new EventEmitter<TaskDto>();
+  @Output() deleteRequested = new EventEmitter<TaskDto>();
 
   // Expose TaskStatus to the template
   TaskStatusEnum = TaskStatus;
+
+  public canModifyTask = false;
+  // Renamed subscription for clarity as it's based on the user object
+  private userSubscription: Subscription | undefined;
+
+  constructor(private store: Store<RootState>) {}
+
+  ngOnInit(): void {
+    this.userSubscription = this.store
+      .pipe(
+        select(selectCurrentUser), // Use the actual selector from auth.selectors
+        tap((user) => console.log('[TaskCard] Current user from store:', user)), // For debugging
+        map((user: UserDto | null | undefined) => {
+          // Explicitly type the user parameter
+          if (user && typeof user.roleId === 'number') {
+            const canModify = user.roleId === 1 || user.roleId === 2; // Owner or Admin
+            console.log(
+              `[TaskCard] User Role ID: ${user.roleId}, Can Modify: ${canModify}`
+            );
+            return canModify;
+          }
+          console.log(
+            '[TaskCard] No user or invalid roleId in store; defaulting to cannot modify.'
+          );
+          return false;
+        })
+      )
+      .subscribe((canModify: boolean) => {
+        console.log(`[TaskCard] Setting canModifyTask to: ${canModify}`);
+        this.canModifyTask = canModify;
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
 
   private categoryColorPalette: string[] = [
     'bg-pink-100 text-pink-700 dark:bg-pink-700 dark:text-pink-100',
@@ -79,6 +132,12 @@ export class TaskCardComponent {
   onEditClick(): void {
     if (this.task) {
       this.editClicked.emit(this.task);
+    }
+  }
+
+  onDeleteClick(): void {
+    if (this.task) {
+      this.deleteRequested.emit(this.task);
     }
   }
 }

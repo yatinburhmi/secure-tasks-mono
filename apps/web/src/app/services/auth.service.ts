@@ -57,7 +57,7 @@ export class AuthService {
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/auth/login`, { email, password })
+      .post<LoginResponse>(`${this.apiUrl}/api/auth/login`, { email, password })
       .pipe(
         tap((response) => {
           if (!response || !response.accessToken) {

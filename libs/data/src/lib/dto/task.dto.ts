@@ -113,6 +113,14 @@ export class CreateTaskDto {
   category?: string;
 }
 
+export class FindAllTasksFiltersDto {
+  @IsOptional()
+  @IsUUID()
+  assigneeId?: string;
+
+  // We can add other potential filters here in the future, e.g., status, date ranges
+}
+
 // Manually define UpdateTaskDto to avoid PartialType
 export class UpdateTaskDto {
   @IsString()

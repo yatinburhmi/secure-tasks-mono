@@ -5,7 +5,10 @@ export const PERM_TASK_CREATE = 'task:create';
 export const PERM_TASK_READ_ALL = 'task:read:all'; // Read all tasks in org
 export const PERM_TASK_READ_ASSIGNED = 'task:read:assigned'; // Read only assigned/created tasks
 export const PERM_TASK_UPDATE = 'task:update';
-export const PERM_TASK_DELETE = 'task:delete';
+export const PERM_TASK_DELETE = 'tasks:delete';
+
+// New permission for viewing tasks across all organizations
+export const PERM_TASK_VIEW_ALL_ORGS = 'tasks:view_all_orgs';
 
 // User Permissions (Example)
 export const PERM_USER_MANAGE = 'user:manage'; // Invite, update roles, remove users

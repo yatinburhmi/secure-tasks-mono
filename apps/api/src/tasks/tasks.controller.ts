@@ -13,9 +13,16 @@ import {
   Req,
   ForbiddenException,
 } from '@nestjs/common';
+import { IsOptional, IsUUID } from 'class-validator';
 import { TasksBackendService } from '@secure-tasks-mono/tasks-backend';
 import { AuthGuard } from '@nestjs/passport';
-import { CreateTaskDto, UpdateTaskDto, TaskDto } from '@secure-tasks-mono/data';
+import {
+  CreateTaskDto,
+  UpdateTaskDto,
+  TaskDto,
+  FindAllTasksFiltersDto,
+  FindAllTasksQueryDto,
+} from '@secure-tasks-mono/data';
 // User as UserEntity is not strictly needed if JwtPayload contains all necessary fields like organizationId
 // import { User as UserEntity } from '@secure-tasks-mono/database';
 import {
@@ -24,6 +31,7 @@ import {
   PERM_TASK_CREATE,
   PERM_TASK_UPDATE,
   PERM_TASK_DELETE,
+  PERM_TASK_VIEW_ALL_ORGS,
   JwtPayload, // Imported JwtPayload
 } from '@secure-tasks-mono/auth';
 
@@ -60,12 +68,28 @@ export class TasksController {
 
   @Get()
   public async findAllTasks(
-    @Req() req: { user: JwtPayload } // Typed req.user as JwtPayload
+    @Req() req: { user: JwtPayload },
+    @Query() query: FindAllTasksQueryDto // Use the DTO for query parameters
   ): Promise<TaskDto[]> {
     const user = req.user; // user is JwtPayload
+
+    const filters: FindAllTasksFiltersDto = {};
+    if (query.assigneeId) {
+      filters.assigneeId = query.assigneeId;
+    }
+
     const tasks = await this.tasksBackendService.findAllTasks(
-      user.organizationId
+      user.organizationId,
+      filters
     );
+    return tasks as unknown as TaskDto[];
+  }
+
+  @Get('all-organizations')
+  @RequirePermissions(PERM_TASK_VIEW_ALL_ORGS)
+  public async findAllTasksForOwner(): Promise<TaskDto[]> {
+    const tasks =
+      await this.tasksBackendService.findAllTasksAcrossOrganizations();
     return tasks as unknown as TaskDto[];
   }
 
