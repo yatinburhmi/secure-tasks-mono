@@ -60,10 +60,10 @@ export class AuthEffects {
             // These dates might not be accurate if only from token, consider fetching full user profile
             createdAt: new Date(
               decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
-            ),
+            ).toISOString(),
             updatedAt: new Date(
               decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
-            ),
+            ).toISOString(),
           };
           const role = mapRoleIdToRoleType(decodedToken.roleId);
           const organization: OrganizationDto = {
@@ -72,10 +72,10 @@ export class AuthEffects {
             parentOrganizationId: null, // This info might not be in the token
             createdAt: new Date(
               decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
-            ),
+            ).toISOString(),
             updatedAt: new Date(
               decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
-            ),
+            ).toISOString(),
           };
 
           return of(
@@ -177,16 +177,16 @@ export class AuthEffects {
                 name: decodedToken.email,
                 roleId: decodedToken.roleId,
                 organizationId: decodedToken.organizationId,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
               };
               const role = mapRoleIdToRoleType(decodedToken.roleId);
               const organization: OrganizationDto = {
                 id: decodedToken.organizationId,
                 name: `Org ${decodedToken.organizationId}`,
                 parentOrganizationId: null,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
               };
               return of(
                 AuthActions.roleSwitchSuccess({

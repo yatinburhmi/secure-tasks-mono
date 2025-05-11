@@ -83,6 +83,28 @@ export class UsersBackendService {
   }
 
   /**
+   * Retrieves all users belonging to a specific organization.
+   * @param organizationId - The ID of the organization.
+   * @returns A promise that resolves to an array of users in that organization.
+   * @throws Error if organizationId is not provided.
+   */
+  public async findAllByOrganization(organizationId: string): Promise<User[]> {
+    if (!organizationId) {
+      // Consider throwing a BadRequestException from '@nestjs/common' if this service is directly hit by controller
+      // For now, simple error for clarity if used internally and ID is expected.
+      throw new Error(
+        'Organization ID must be provided when calling findAllByOrganization.'
+      );
+    }
+    return this.userRepository.find({
+      where: { organizationId },
+      // Example: If you need to ensure certain fields are not returned,
+      // you might use `select` option if not handled by DTO mapping at controller level.
+      // select: ['id', 'name', 'email', 'roleId', 'organizationId', 'isActive', 'createdAt', 'updatedAt'],
+    });
+  }
+
+  /**
    * Updates an existing user.
    * @param id - The ID of the user to update.
    * @param updateUserDto - Data for updating the user.

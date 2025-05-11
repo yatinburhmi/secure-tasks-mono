@@ -31,6 +31,16 @@ export const selectTasksError = createSelector(
   (state) => state.error
 );
 
+export const selectTasksCreating = createSelector(
+  selectTasksState,
+  (state) => state.isCreating
+);
+
+export const selectTasksUpdating = createSelector(
+  selectTasksState,
+  (state) => state.isUpdating
+);
+
 // Derived selectors
 export const selectSelectedTask = createSelector(
   selectTaskEntities,

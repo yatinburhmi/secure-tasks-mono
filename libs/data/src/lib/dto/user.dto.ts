@@ -40,8 +40,11 @@ export class UserDto {
   // role?: RoleDto;
   // organization?: OrganizationDto;
 
-  createdAt!: Date;
-  updatedAt!: Date;
+  @IsString()
+  createdAt!: string;
+
+  @IsString()
+  updatedAt!: string;
 }
 
 export class CreateUserDto {

@@ -44,28 +44,28 @@ export const tasksReducer = createReducer(
   // Create Task
   on(createTask, (state) => ({
     ...state,
-    isLoading: true,
+    isCreating: true,
     error: null,
   })),
 
   on(createTaskSuccess, (state, { task }) =>
     tasksAdapter.addOne(task, {
       ...state,
-      isLoading: false,
+      isCreating: false,
       error: null,
     })
   ),
 
   on(createTaskFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
+    isCreating: false,
     error,
   })),
 
   // Update Task
   on(updateTask, (state) => ({
     ...state,
-    isLoading: true,
+    isUpdating: true,
     error: null,
   })),
 
@@ -74,7 +74,7 @@ export const tasksReducer = createReducer(
       { id: task.id, changes: task },
       {
         ...state,
-        isLoading: false,
+        isUpdating: false,
         error: null,
       }
     )
@@ -82,7 +82,7 @@ export const tasksReducer = createReducer(
 
   on(updateTaskFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
+    isUpdating: false,
     error,
   })),
 

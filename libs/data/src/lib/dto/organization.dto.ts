@@ -15,8 +15,11 @@ export class OrganizationDto {
   // parentOrganization?: OrganizationDto;
   // childOrganizations?: OrganizationDto[];
 
-  createdAt!: Date;
-  updatedAt!: Date;
+  @IsString()
+  createdAt!: string;
+
+  @IsString()
+  updatedAt!: string;
 }
 
 export class CreateOrganizationDto {

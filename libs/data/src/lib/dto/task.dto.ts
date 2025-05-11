@@ -86,14 +86,12 @@ export class CreateTaskDto {
   status!: TaskStatus; // Consider a default value in the service if appropriate
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Max(5)
-  priority?: number; // e.g., 1 (Highest) to 5 (Lowest)
-
-  @IsOptional()
   @IsString()
   dueDate?: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  creatorId!: string;
 
   @IsOptional()
   @IsUUID()
@@ -131,12 +129,6 @@ export class UpdateTaskDto {
   @IsEnum(TaskStatus)
   @IsOptional()
   status?: TaskStatus;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Max(5)
-  priority?: number;
 
   @IsOptional()
   @IsString()

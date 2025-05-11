@@ -82,8 +82,8 @@ export class AuthService {
               // isActive: true, // Removed as it's not in UserDto
               roleId: decodedToken.roleId,
               organizationId: decodedToken.organizationId,
-              createdAt: new Date(),
-              updatedAt: new Date(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
               // roles: [], // Removed as UserDto might not have it, and role is handled separately
             };
 
@@ -93,8 +93,8 @@ export class AuthService {
               id: decodedToken.organizationId,
               name: `Org ${decodedToken.organizationId}`,
               parentOrganizationId: null,
-              createdAt: new Date(),
-              updatedAt: new Date(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
             };
 
             this.store.dispatch(

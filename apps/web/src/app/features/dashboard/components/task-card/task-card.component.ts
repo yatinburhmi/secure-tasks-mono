@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { TaskDto, TaskStatus } from '@secure-tasks-mono/data';
 
@@ -12,6 +12,11 @@ import { TaskDto, TaskStatus } from '@secure-tasks-mono/data';
 export class TaskCardComponent {
   @Input({ required: true }) task!: TaskDto;
   @Input() viewContext: 'list' | 'board' = 'board';
+  @Output() statusChanged = new EventEmitter<{
+    taskId: string;
+    newStatus: TaskStatus;
+  }>();
+  @Output() editClicked = new EventEmitter<TaskDto>();
 
   // Expose TaskStatus to the template
   TaskStatusEnum = TaskStatus;
@@ -69,5 +74,11 @@ export class TaskCardComponent {
     return (
       dueDate.getTime() < Date.now() && task.status !== this.TaskStatusEnum.DONE
     );
+  }
+
+  onEditClick(): void {
+    if (this.task) {
+      this.editClicked.emit(this.task);
+    }
   }
 }

@@ -4,6 +4,8 @@ import { TaskDto } from '@secure-tasks-mono/data';
 export interface TasksState extends EntityState<TaskDto> {
   selectedTaskId: string | null;
   isLoading: boolean;
+  isCreating: boolean;
+  isUpdating: boolean;
   error: string | null;
 }
 
@@ -14,5 +16,7 @@ export const tasksAdapter = createEntityAdapter<TaskDto>({
 export const initialTasksState: TasksState = tasksAdapter.getInitialState({
   selectedTaskId: null,
   isLoading: false,
+  isCreating: false,
+  isUpdating: false,
   error: null,
 });
