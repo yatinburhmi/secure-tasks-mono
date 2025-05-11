@@ -1,4 +1,10 @@
-import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -30,11 +36,11 @@ export class ModalComponent {
 
   // Optional: Handle clicks for closing when clicking outside the modal content
   // This requires careful handling in the template to distinguish content clicks from backdrop clicks.
-  // For simplicity in this first pass, we'll rely on a close button. 
+  // For simplicity in this first pass, we'll rely on a close button.
   // A more robust implementation would check if event.target is the backdrop itself.
   onBackdropClick(): void {
     if (this.isOpen && this.closeOnOutsideClick) {
-      this.onClose(); 
+      this.onClose();
     }
   }
-} 
+}

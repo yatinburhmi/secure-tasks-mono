@@ -138,9 +138,12 @@ export class AuthService {
   }
 
   public switchRole(newRoleId: number): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/switch-role`, {
-      newRoleId,
-    });
+    return this.http.post<LoginResponse>(
+      `${this.apiUrl}/api/auth/switch-role`,
+      {
+        newRoleId,
+      }
+    );
     // The NgRx effect will handle the response (saving token, decoding, dispatching success/failure)
   }
 

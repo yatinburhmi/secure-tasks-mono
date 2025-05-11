@@ -4,6 +4,62 @@ import { of } from 'rxjs';
 import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
 import { TasksHttpService } from '../../core/services/tasks-http.service';
 import * as TasksActions from './tasks.actions';
+import { CreateTaskDto, UpdateTaskDto, TaskDto } from '@secure-tasks-mono/data';
+
+// Helper function to convert nulls to undefined for specific DTO fields
+function prepareCreateTaskData(
+  rawData: Omit<TaskDto, 'id' | 'createdAt' | 'updatedAt'>
+): CreateTaskDto {
+  const { description, category, dueDate, assigneeId, ...rest } = rawData;
+  return {
+    title: rest.title,
+    status: rest.status,
+    creatorId: rest.creatorId,
+    organizationId: rest.organizationId,
+    description: description === null ? undefined : description,
+    category: category === null ? undefined : category,
+    dueDate: dueDate === null ? undefined : dueDate,
+    assigneeId: assigneeId === null ? undefined : assigneeId,
+    tags: rest.tags,
+  };
+}
+
+function prepareUpdateTaskData(rawData: Partial<TaskDto>): UpdateTaskDto {
+  const {
+    description,
+    category,
+    dueDate,
+    assigneeId,
+    organizationId,
+    ...rest
+  } = rawData;
+
+  const preparedChanges: UpdateTaskDto = { ...rest };
+
+  if ('description' in rawData) {
+    preparedChanges.description =
+      rawData.description === null ? undefined : rawData.description;
+  }
+  if ('category' in rawData) {
+    preparedChanges.category =
+      rawData.category === null ? undefined : rawData.category;
+  }
+  if ('dueDate' in rawData) {
+    preparedChanges.dueDate =
+      rawData.dueDate === null ? undefined : rawData.dueDate;
+  }
+  if ('assigneeId' in rawData) {
+    preparedChanges.assigneeId =
+      rawData.assigneeId === null ? undefined : rawData.assigneeId;
+  }
+  if ('organizationId' in rawData && rawData.organizationId === null) {
+    // This case should ideally not happen as organizationId is not nullable in TaskDto.
+    // If it could be null and needed to be stripped or set to undefined:
+    // preparedChanges.organizationId = undefined; // Or delete preparedChanges.organizationId;
+  }
+
+  return preparedChanges;
+}
 
 @Injectable()
 export class TasksEffects {
@@ -31,8 +87,9 @@ export class TasksEffects {
   readonly createTask$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TasksActions.createTask),
-      mergeMap((action) =>
-        this.tasksHttpService.createTask(action.taskData).pipe(
+      mergeMap((action) => {
+        const preparedTaskData = prepareCreateTaskData(action.taskData);
+        return this.tasksHttpService.createTask(preparedTaskData).pipe(
           map((task) => TasksActions.createTaskSuccess({ task })),
           catchError((error) =>
             of(
@@ -41,26 +98,29 @@ export class TasksEffects {
               })
             )
           )
-        )
-      )
+        );
+      })
     )
   );
 
   readonly updateTask$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TasksActions.updateTask),
-      mergeMap((action) =>
-        this.tasksHttpService.updateTask(action.id, action.changes).pipe(
-          map((task) => TasksActions.updateTaskSuccess({ task })),
-          catchError((error) =>
-            of(
-              TasksActions.updateTaskFailure({
-                error: error.message || 'Failed to update task',
-              })
+      mergeMap((action) => {
+        const preparedChanges = prepareUpdateTaskData(action.changes);
+        return this.tasksHttpService
+          .updateTask(action.id, preparedChanges)
+          .pipe(
+            map((task) => TasksActions.updateTaskSuccess({ task })),
+            catchError((error) =>
+              of(
+                TasksActions.updateTaskFailure({
+                  error: error.message || 'Failed to update task',
+                })
+              )
             )
-          )
-        )
-      )
+          );
+      })
     )
   );
 
