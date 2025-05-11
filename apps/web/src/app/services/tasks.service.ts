@@ -11,7 +11,7 @@ import { jwtDecode } from 'jwt-decode';
   providedIn: 'root',
 })
 export class TasksService {
-  private readonly apiUrl = `${environment.apiUrl}/tasks`;
+  private readonly apiUrl = `${environment.apiUrl}/api/tasks`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

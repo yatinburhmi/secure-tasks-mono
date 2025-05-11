@@ -2,8 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
+import { TasksService } from '../../services/tasks.service';
 import { TasksHttpService } from '../../core/services/tasks-http.service';
 import * as TasksActions from './tasks.actions';
+import * as AuthActions from '../../store/auth/auth.actions';
 import { CreateTaskDto, UpdateTaskDto, TaskDto } from '@secure-tasks-mono/data';
 
 // Helper function to convert nulls to undefined for specific DTO fields
@@ -64,13 +66,14 @@ function prepareUpdateTaskData(rawData: Partial<TaskDto>): UpdateTaskDto {
 @Injectable()
 export class TasksEffects {
   private readonly actions$ = inject(Actions);
+  private readonly tasksService = inject(TasksService);
   private readonly tasksHttpService = inject(TasksHttpService);
 
   readonly loadTasks$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(TasksActions.loadTasks),
+      ofType(TasksActions.loadTasks, AuthActions.roleSwitchSuccess),
       switchMap(() =>
-        this.tasksHttpService.getTasks().pipe(
+        this.tasksService.getAllTasks().pipe(
           map((tasks) => TasksActions.loadTasksSuccess({ tasks })),
           catchError((error) =>
             of(
