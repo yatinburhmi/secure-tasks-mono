@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types'; // For Update DTO
 
 export class OrganizationDto {
   @IsUUID()
@@ -30,4 +29,15 @@ export class CreateOrganizationDto {
   parentOrganizationId?: string | null;
 }
 
-export class UpdateOrganizationDto extends PartialType(CreateOrganizationDto) {}
+// Manually define UpdateOrganizationDto to avoid PartialType and its problematic dependencies for frontend
+export class UpdateOrganizationDto {
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty() // Retain NotEmpty if you want to ensure that if 'name' is provided, it's not empty.
+  // If truly optional and can be empty string if sent, remove NotEmpty.
+  name?: string;
+
+  @IsUUID()
+  @IsOptional()
+  parentOrganizationId?: string | null;
+}

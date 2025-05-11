@@ -14,7 +14,6 @@ import { LoginComponent } from './login/login.component';
 import { rootReducer, rootEffects } from './store';
 
 @NgModule({
-  declarations: [AppComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -38,6 +37,7 @@ import { rootReducer, rootEffects } from './store';
     }),
     DashboardComponent,
     LoginComponent,
+    AppComponent,
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { RoleSwitcherComponent } from './components/role-switcher/role-switcher.component';
 
 @Component({
   selector: 'app-root',
-  standalone: false,
+  standalone: true,
+  imports: [RouterModule, RoleSwitcherComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'web';
+  title = 'Task Management';
 }

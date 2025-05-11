@@ -7,7 +7,6 @@ import {
   IsUUID,
   IsInt,
 } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types'; // For UpdateUserDto
 import { Type } from 'class-transformer';
 
 // Placeholder: Will import relations later when defined

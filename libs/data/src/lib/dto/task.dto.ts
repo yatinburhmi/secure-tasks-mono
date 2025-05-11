@@ -14,7 +14,6 @@ import {
   Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
 // Placeholder: Will import relations later when defined
 // import { UserDto } from './user.dto';
 // import { OrganizationDto } from './organization.dto';
@@ -122,4 +121,53 @@ export class CreateTaskDto {
   category?: string;
 }
 
-export class UpdateTaskDto extends PartialType(CreateTaskDto) {}
+// Manually define UpdateTaskDto to avoid PartialType
+export class UpdateTaskDto {
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty() // If title is provided, it must not be empty
+  @Length(3, 255)
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(0, 1000)
+  description?: string;
+
+  @IsEnum(TaskStatus)
+  @IsOptional()
+  status?: TaskStatus;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  priority?: number;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  dueDate?: Date;
+
+  @IsOptional()
+  @IsUUID()
+  assigneeId?: string;
+
+  // organizationId is typically not updatable on an existing task,
+  // but the controller checks for it to prevent unauthorized changes.
+  @IsOptional()
+  @IsUUID()
+  @IsNotEmpty() // If provided, it must be a valid UUID
+  organizationId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMaxSize(10)
+  tags?: string[];
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  category?: string;
+}
