@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskDto, TaskStatus } from '@secure-tasks-mono/data'; // Assuming path alias is set
+import { TaskCardComponent } from '../../components/task-card/task-card.component'; // Import the new TaskCardComponent
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TaskCardComponent], // Add TaskCardComponent to imports
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
 })

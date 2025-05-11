@@ -69,55 +69,33 @@
         <!-- Pending Tasks Column -->
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow">
           <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">Pending ({{ pendingTasks.length }})</h3>
-          <div class="space-y-3 h-96 overflow-y-auto">
+          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1">
             <div *ngIf="pendingTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No pending tasks.
             </div>
-            <div *ngFor="let task of pendingTasks" 
-                 class="bg-white dark:bg-gray-700 p-4 rounded-md shadow hover:shadow-lg transition-shadow duration-200 cursor-grab">
-              <h4 class="font-medium text-gray-800 dark:text-gray-100 truncate" title="{{ task.title }}">{{ task.title }}</h4>
-              <p *ngIf="task.description" class="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate" title="{{ task.description }}">
-                {{ task.description }}
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Status: {{ task.status }}</p>
-              <!-- More details like assignee, due date can be added later with TaskCardComponent -->
-            </div>
+            <app-task-card *ngFor="let task of pendingTasks" [task]="task"></app-task-card>
           </div>
         </div>
 
         <!-- In Progress Tasks Column -->
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow">
           <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">In Progress ({{ inProgressTasks.length }})</h3>
-          <div class="space-y-3 h-96 overflow-y-auto">
+          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1">
             <div *ngIf="inProgressTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks in progress.
             </div>
-            <div *ngFor="let task of inProgressTasks" 
-                 class="bg-white dark:bg-gray-700 p-4 rounded-md shadow hover:shadow-lg transition-shadow duration-200 cursor-grab">
-              <h4 class="font-medium text-gray-800 dark:text-gray-100 truncate" title="{{ task.title }}">{{ task.title }}</h4>
-              <p *ngIf="task.description" class="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate" title="{{ task.description }}">
-                {{ task.description }}
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Status: {{ task.status }}</p>
-            </div>
+            <app-task-card *ngFor="let task of inProgressTasks" [task]="task"></app-task-card>
           </div>
         </div>
 
         <!-- Done Tasks Column -->
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow">
           <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">Done ({{ doneTasks.length }})</h3>
-          <div class="space-y-3 h-96 overflow-y-auto">
+          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1">
             <div *ngIf="doneTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks done.
             </div>
-            <div *ngFor="let task of doneTasks" 
-                 class="bg-white dark:bg-gray-700 p-4 rounded-md shadow hover:shadow-lg transition-shadow duration-200 cursor-grab opacity-75">
-              <h4 class="font-medium text-gray-800 dark:text-gray-100 truncate line-through" title="{{ task.title }}">{{ task.title }}</h4>
-              <p *ngIf="task.description" class="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate line-through" title="{{ task.description }}">
-                {{ task.description }}
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Status: {{ task.status }}</p>
-            </div>
+            <app-task-card *ngFor="let task of doneTasks" [task]="task"></app-task-card>
           </div>
         </div>
       </div>
