@@ -25,6 +25,23 @@ export const loginFailure = createAction(
 export const logout = createAction('[Auth] Logout');
 export const logoutSuccess = createAction('[Auth] Logout Success');
 
+// Initialize Auth Actions
+export const initializeAuth = createAction('[Auth] Initialize Auth');
+
+export const initializeAuthSuccess = createAction(
+  '[Auth] Initialize Auth Success',
+  props<{
+    user: UserDto;
+    role: RoleType;
+    organization: OrganizationDto;
+    accessToken: string; // Include accessToken to store it if needed
+  }>()
+);
+
+export const initializeAuthFailure = createAction(
+  '[Auth] Initialize Auth Failure'
+);
+
 // Role Switch Actions
 export const roleSwitchAttempt = createAction(
   '[Auth API] Role Switch Attempt',

@@ -9,6 +9,9 @@ import {
   roleSwitchAttempt,
   roleSwitchSuccess,
   roleSwitchFailure,
+  initializeAuth,
+  initializeAuthSuccess,
+  initializeAuthFailure,
 } from './auth.actions';
 import { initialAuthState } from './auth.state';
 
@@ -50,6 +53,36 @@ export const authReducer = createReducer(
 
   on(logoutSuccess, () => ({
     ...initialAuthState,
+  })),
+
+  // Initialize Auth Actions
+  on(initializeAuth, (state) => ({
+    ...state,
+    isLoading: true,
+    error: null,
+  })),
+
+  on(
+    initializeAuthSuccess,
+    (state, { user, role, organization, accessToken }) => ({
+      ...state,
+      currentUser: user,
+      currentRole: role,
+      organization,
+      accessToken,
+      isLoading: false,
+      error: null,
+    })
+  ),
+
+  on(initializeAuthFailure, (state) => ({
+    ...state,
+    currentUser: null,
+    currentRole: null,
+    organization: null,
+    accessToken: null,
+    isLoading: false,
+    error: null,
   })),
 
   // Role Switch Actions

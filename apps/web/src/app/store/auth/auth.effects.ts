@@ -33,6 +33,71 @@ export class AuthEffects {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
+  readonly initializeAuth$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.initializeAuth),
+      switchMap(() => {
+        const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+        if (!accessToken) {
+          return of(AuthActions.initializeAuthFailure());
+        }
+
+        try {
+          const decodedToken = jwtDecode<DecodedJwtPayload>(accessToken);
+          // Optional: Check token expiration (decodedToken.exp)
+          const currentTime = Math.floor(Date.now() / 1000);
+          if (decodedToken.exp && decodedToken.exp < currentTime) {
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            return of(AuthActions.initializeAuthFailure());
+          }
+
+          const user: UserDto = {
+            id: decodedToken.sub,
+            email: decodedToken.email,
+            name: decodedToken.email, // Or a dedicated name claim if available
+            roleId: decodedToken.roleId,
+            organizationId: decodedToken.organizationId,
+            // These dates might not be accurate if only from token, consider fetching full user profile
+            createdAt: new Date(
+              decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
+            ),
+            updatedAt: new Date(
+              decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
+            ),
+          };
+          const role = mapRoleIdToRoleType(decodedToken.roleId);
+          const organization: OrganizationDto = {
+            id: decodedToken.organizationId,
+            name: `Org ${decodedToken.organizationId}`, // Or a dedicated org name claim
+            parentOrganizationId: null, // This info might not be in the token
+            createdAt: new Date(
+              decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
+            ),
+            updatedAt: new Date(
+              decodedToken.iat ? decodedToken.iat * 1000 : Date.now()
+            ),
+          };
+
+          return of(
+            AuthActions.initializeAuthSuccess({
+              user,
+              role,
+              organization,
+              accessToken,
+            })
+          );
+        } catch (error) {
+          console.error(
+            '[AuthEffects:initializeAuth$] Error processing token:',
+            error
+          );
+          localStorage.removeItem(ACCESS_TOKEN_KEY);
+          return of(AuthActions.initializeAuthFailure());
+        }
+      })
+    )
+  );
+
   readonly login$ = createEffect(
     () =>
       this.actions$.pipe(

@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LayoutComponent } from './core/layout/layout.component';
+import { Store } from '@ngrx/store';
+import * as AuthActions from './store/auth/auth.actions';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +10,12 @@ import { LayoutComponent } from './core/layout/layout.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'web';
+
+  constructor(private store: Store) {}
+
+  ngOnInit(): void {
+    this.store.dispatch(AuthActions.initializeAuth());
+  }
 }
