@@ -38,30 +38,38 @@
   <!-- Status Filter Tabs - Conditionally show only for list view -->
   <div class="mb-6" *ngIf="currentView === 'list'">
     <div class="border-b border-gray-200 dark:border-gray-700">
-      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-        <!-- TODO: Make these dynamic and handle click events -->
-        <a href="#" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-purple-500 text-purple-600 dark:text-purple-400 dark:border-purple-400" aria-current="page">
-          All
-        </a>
-        <a href="#" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500">
-          Pending
-        </a>
-        <a href="#" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500">
-          In Progress
-        </a>
-        <a href="#" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500">
-          Done
+      <nav class="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto pb-px" aria-label="Tabs">
+        <a *ngFor="let filter of statusFilters" 
+           href="#"
+           (click)="selectStatusFilter(filter); $event.preventDefault()"
+           [attr.aria-current]="filter === selectedStatusFilter ? 'page' : null"
+           [ngClass]="{
+            'border-purple-500 text-purple-600 dark:text-purple-400 dark:border-purple-400': filter === selectedStatusFilter,
+            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500': filter !== selectedStatusFilter
+           }"
+           class="whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-sm">
+          {{ filter === 'ALL_CAPS_VALUE' ? 'All' : (filter | titlecase) }} <!-- Assuming TaskStatus values are like PENDING, IN_PROGRESS. Adjust if needed -->
         </a>
       </nav>
     </div>
   </div>
 
   <!-- Main Content Area (List or Board) -->
-  <div class="content-area">
+  <div class="content-area mt-6 sm:mt-0">
     <div *ngIf="currentView === 'list'; else boardView">
-      <!-- Placeholder for Task List View -->
-      <p class="text-gray-700 dark:text-gray-300">Task List View will be here.</p>
-      <!-- Task cards will be rendered here based on selected filters -->
+      <!-- Task List View -->
+      <div *ngIf="listTasks.length > 0; else noListTasks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <app-task-card *ngFor="let task of listTasks" [task]="task" [viewContext]="'list'"></app-task-card>
+      </div>
+      <ng-template #noListTasks>
+        <div class="text-center text-gray-500 dark:text-gray-400 py-10">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No tasks found</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No tasks match the current filter. Try selecting a different filter or creating a new task.</p>
+        </div>
+      </ng-template>
     </div>
     <ng-template #boardView>
       <!-- Board View -->
@@ -73,7 +81,7 @@
             <div *ngIf="pendingTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No pending tasks.
             </div>
-            <app-task-card *ngFor="let task of pendingTasks" [task]="task"></app-task-card>
+            <app-task-card *ngFor="let task of pendingTasks" [task]="task" [viewContext]="'board'"></app-task-card>
           </div>
         </div>
 
@@ -84,7 +92,7 @@
             <div *ngIf="inProgressTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks in progress.
             </div>
-            <app-task-card *ngFor="let task of inProgressTasks" [task]="task"></app-task-card>
+            <app-task-card *ngFor="let task of inProgressTasks" [task]="task" [viewContext]="'board'"></app-task-card>
           </div>
         </div>
 
@@ -95,7 +103,7 @@
             <div *ngIf="doneTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks done.
             </div>
-            <app-task-card *ngFor="let task of doneTasks" [task]="task"></app-task-card>
+            <app-task-card *ngFor="let task of doneTasks" [task]="task" [viewContext]="'board'"></app-task-card>
           </div>
         </div>
       </div>

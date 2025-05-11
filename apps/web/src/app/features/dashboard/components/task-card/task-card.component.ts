@@ -11,6 +11,7 @@ import { TaskDto, TaskStatus } from '@secure-tasks-mono/data';
 })
 export class TaskCardComponent {
   @Input({ required: true }) task!: TaskDto;
+  @Input() viewContext: 'list' | 'board' = 'board';
 
   // Expose TaskStatus to the template
   TaskStatusEnum = TaskStatus;

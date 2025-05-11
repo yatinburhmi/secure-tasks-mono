@@ -21,6 +21,7 @@ export class DashboardPageComponent implements OnInit {
   pendingTasks: TaskDto[] = [];
   inProgressTasks: TaskDto[] = [];
   doneTasks: TaskDto[] = [];
+  listTasks: TaskDto[] = []; // For the list view
 
   // Simple UUID generator for mock data
   private _generateUUID(): string {
@@ -117,35 +118,40 @@ export class DashboardPageComponent implements OnInit {
 
   ngOnInit(): void {
     this._loadMockTasks();
-    this._filterTasksByStatus();
+    this._filterTasksByStatus(); // For board view columns
     // Initialize statusFilters from TaskStatus enum
+    // Ensure 'All' is always first, then unique enum values if TaskStatus might have overlapping string representations with 'All'
     this.statusFilters = ['All', ...Object.values(TaskStatus)];
-    // console.log('All tasks loaded:', this.allTasks);
-    // console.log('Pending tasks:', this.pendingTasks);
-    // console.log('In Progress tasks:', this.inProgressTasks);
-    // console.log('Done tasks:', this.doneTasks);
+    this._updateListTasks(); // Initialize for list view
+  }
+
+  private _updateListTasks(): void {
+    if (this.selectedStatusFilter === 'All' || !this.selectedStatusFilter) {
+      this.listTasks = [...this.allTasks];
+    } else {
+      // Ensure selectedStatusFilter is treated as TaskStatus for comparison if it's an enum value
+      this.listTasks = this.allTasks.filter(
+        (task) => task.status === (this.selectedStatusFilter as TaskStatus)
+      );
+    }
   }
 
   setView(view: 'list' | 'board'): void {
     this.currentView = view;
     this.pageTitle = view === 'board' ? 'Task Board' : 'Task Management';
+    if (view === 'list') {
+      this._updateListTasks(); // Update list when switching to list view
+    }
   }
 
   selectStatusFilter(status: string): void {
     this.selectedStatusFilter = status;
-    // TODO: Add logic to actually filter tasks when data is available
-    // For now, this will apply to the 'list' view if we implement it there.
-    // For the 'board' view, tasks are already segregated by status columns.
-    console.log('Selected filter:', status);
-    if (status === 'All') {
-      this._filterTasksByStatus(); // Reset board view to show all tasks in their respective columns
-    } else {
-      // This specific filtering logic might be more applicable to a list view.
-      // For the board, it's inherently filtered by columns.
-      // However, if we wanted to "dim" other columns or similar, this could be a place.
-      // For now, let's ensure the board columns are always populated correctly.
-      this._filterTasksByStatus(); // Re-filter to ensure board columns are correct.
-    }
+    this._updateListTasks(); // Update list tasks based on new filter
+
+    // For the board view, tasks are already segregated by status columns.
+    // If needed, one could re-trigger _filterTasksByStatus() here if the board
+    // should also reflect some global filter, but typically it does not.
+    // console.log('Selected filter for list view:', status);
   }
 
   // TODO: Implement other methods for filters, new task, etc.
