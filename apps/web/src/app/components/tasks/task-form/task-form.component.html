@@ -63,28 +63,44 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Category -->
-    <div>
-      <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-      <input type="text" id="category" formControlName="category"
-             placeholder="Enter category (e.g., Work, Personal)"
-             class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm 
-                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-300 
-                    border-gray-300 dark:border-gray-600 
-                    placeholder-gray-500 dark:placeholder-gray-400 
-                    focus:ring-purple-500 focus:border-purple-500"
-             [ngClass]="{
-               'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500': isInvalid('category')
-             }">
-      <div *ngIf="isInvalid('category')" class="mt-1 text-xs text-red-600 dark:text-red-400">
-        <span *ngIf="taskForm.get('category')?.errors?.['maxlength']">Category cannot exceed 50 characters.</span>
-      </div>
+  <!-- Category - Moved out of the 2-column grid to be full width -->
+  <div>
+    <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+    <input type="text" id="category" formControlName="category"
+           placeholder="Enter category (e.g., Work, Personal)"
+           class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm 
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-300 
+                  border-gray-300 dark:border-gray-600 
+                  placeholder-gray-500 dark:placeholder-gray-400 
+                  focus:ring-purple-500 focus:border-purple-500"
+           [ngClass]="{
+             'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500': isInvalid('category')
+           }">
+    <div *ngIf="isInvalid('category')" class="mt-1 text-xs text-red-600 dark:text-red-400">
+      <span *ngIf="taskForm.get('category')?.errors?.['maxlength']">Category cannot exceed 50 characters.</span>
     </div>
-
-    <!-- Priority Removed -->
-    <!-- Removed Priority div -->
   </div>
+
+  <!-- Tags -->
+  <div>
+    <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags</label>
+    <input type="text" id="tags" formControlName="tags"
+           placeholder="Enter tags, comma-separated (e.g., urgent, frontend, bug)"
+           class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-300
+                  border-gray-300 dark:border-gray-600
+                  placeholder-gray-500 dark:placeholder-gray-400
+                  focus:ring-purple-500 focus:border-purple-500"
+           aria-describedby="tags-description">
+    <p id="tags-description" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+      Up to 10 tags. Each tag will be trimmed.
+    </p>
+    <!-- We can add error display here if specific client-side validation for tags is added later -->
+    <!-- For now, backend validation via DTO handles max tags and length -->
+  </div>
+
+  <!-- Priority Removed -->
+  <!-- Removed Priority div -->
 
   <!-- Assignee -->
   <div>

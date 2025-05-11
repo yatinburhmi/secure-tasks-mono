@@ -54,6 +54,13 @@
 
   <!-- Card Footer: Status, Due Date, Tags -->
   <div class="mt-auto">
+    <!-- Category Badge -->
+    <div *ngIf="task.category" class="mb-2">
+      <span [ngClass]="getCategoryBadgeClasses(task.category)">
+        {{ task.category }}
+      </span>
+    </div>
+
     <!-- Tags -->
     <div *ngIf="task.tags && task.tags.length > 0" class="mb-2 flex flex-wrap gap-1">
       <span *ngFor="let tag of task.tags" 
