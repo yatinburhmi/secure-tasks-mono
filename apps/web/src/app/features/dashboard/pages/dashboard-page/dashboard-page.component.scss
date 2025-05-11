@@ -1,7 +1,7 @@
 /* Styles for DashboardPageComponent - primarily using Tailwind utilities */ 
 
 // Custom scrollbar styling for dark mode in WebKit and Firefox
-:host ::ng-deep .dark .column-task-list {
+::ng-deep .dark .column-task-list {
   // For Firefox
   scrollbar-width: thin;
   scrollbar-color: #4A5568 #2D3748; // thumb color, track color (Tailwind gray-600, gray-700)
@@ -29,7 +29,8 @@
 }
 
 // Light mode scrollbar (optional, if default is not desired)
-// :host ::ng-deep .column-task-list {
+// Option 1: If you want specific light mode scrollbars for these elements
+// ::ng-deep .column-task-list { // Assuming no .dark class means light mode
 //   // For Firefox
 //   scrollbar-width: thin;
 //   scrollbar-color: #A0AEC0 #EDF2F7; // gray-500, gray-200
@@ -52,6 +53,8 @@
 //   }
 
 //   &::-webkit-scrollbar-thumb:hover {
-//     background-color: #718096; // gray-400
+//     background-color: #718096; // gray-400 // This hover might be too dark for light mode, consider #CBD5E0 (gray-300)
 //   }
-// } 
+// }
+
+// Option 2: If default browser scrollbars are acceptable for light mode, no explicit light mode styles are needed here. 
