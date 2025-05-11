@@ -1,33 +1,47 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { RoleType } from '@secure-tasks-mono/data';
-import { switchRole } from '../../store/auth/auth.actions';
+import { AuthService } from '../../services/auth.service';
+import { RootState } from '../../store';
+import { selectCurrentRole } from '../../store/auth/auth.selectors';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-role-switcher',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './role-switcher.component.html',
   styleUrls: ['./role-switcher.component.css'],
 })
-export class RoleSwitcherComponent {
-  private readonly store = inject(Store);
+export class RoleSwitcherComponent implements OnInit {
+  private readonly authService = inject(AuthService);
+  private readonly store = inject(Store<RootState>);
 
-  // Define roles directly to prevent dynamic requires
-  readonly roles: RoleType[] = [
+  public availableRoles: RoleType[] = [
     RoleType.OWNER,
     RoleType.ADMIN,
     RoleType.VIEWER,
   ];
+  public selectedRole: RoleType = RoleType.VIEWER;
+
+  ngOnInit(): void {
+    this.store
+      .select(selectCurrentRole)
+      .pipe(take(1))
+      .subscribe((role) => {
+        if (role) {
+          this.selectedRole = role;
+        }
+      });
+  }
 
   /**
    * Handles role change event from the select element
-   * @param event Change event from select element
+   * Dispatches the switchRole action via AuthService
    */
-  handleRoleChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const role = select.value as RoleType;
-    this.store.dispatch(switchRole({ role }));
+  public handleRoleChange(newRole: RoleType): void {
+    this.authService.switchRole(newRole);
   }
 }

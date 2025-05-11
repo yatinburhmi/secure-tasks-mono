@@ -67,13 +67,13 @@ export class AuthEffects {
     { dispatch: false }
   );
 
-  // Development only
-  readonly switchRole$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(switchRole),
-        exhaustMap(({ role }) => this.authService.switchRole(role))
-      ),
-    { dispatch: false }
-  );
+  // Development only - switchRole$ effect removed as AuthService now dispatches directly
+  // readonly switchRole$ = createEffect(
+  //   () =>
+  //     this.actions$.pipe(
+  //       ofType(switchRole),
+  //       exhaustMap(({ role }) => this.authService.switchRole(role))
+  //     ),
+  //   { dispatch: false }
+  // );
 }

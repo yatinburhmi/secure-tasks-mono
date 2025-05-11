@@ -1,9 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { UserDto, OrganizationDto, RoleType } from '@secure-tasks-mono/data';
 import { environment } from '../../environments/environment';
+import { Store } from '@ngrx/store';
+import { RootState } from '../store';
+import * as AuthActions from '../store/auth/auth.actions';
 
 export interface LoginResponse {
   user: UserDto;
@@ -21,6 +24,7 @@ export interface AuthResponse {
 })
 export class AuthService {
   private readonly apiUrl = environment.apiUrl;
+  private readonly store = inject(Store<RootState>);
 
   constructor(private http: HttpClient) {}
 
@@ -55,11 +59,8 @@ export class AuthService {
     });
   }
 
-  // For development only
-  switchRole(role: RoleType): Observable<RoleType> {
-    return new Observable((subscriber) => {
-      subscriber.next(role);
-      subscriber.complete();
-    });
+  // For development only - now dispatches to NgRx store
+  public switchRole(newRole: RoleType): void {
+    this.store.dispatch(AuthActions.switchRole({ role: newRole }));
   }
 }
