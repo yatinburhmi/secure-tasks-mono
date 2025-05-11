@@ -9,3 +9,4 @@ export * from './lib/dto/role.dto';
 export * from './lib/dto/task.dto';
 export * from './lib/dto/permission.dto';
 export * from './lib/dto/audit-log.dto';
+export * from './lib/dto/login-user.dto';

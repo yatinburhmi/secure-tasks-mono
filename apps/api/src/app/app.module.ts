@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppDataSourceOptions } from '@secure-tasks-mono/database';
-import { AuthModule } from '@secure-tasks-mono/auth';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from '../users/users.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { AuditLogApiModule } from '../audit-log/audit-log.module';
+import { AuthModule as ApiAppAuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { AuditLogApiModule } from '../audit-log/audit-log.module';
       },
       inject: [],
     }),
-    AuthModule,
+    ApiAppAuthModule,
     UsersModule,
     OrganizationsModule,
     TasksModule,
