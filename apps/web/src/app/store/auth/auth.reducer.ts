@@ -5,8 +5,10 @@ import {
   loginFailure,
   logout,
   logoutSuccess,
-  switchRole,
   clearAuthError,
+  roleSwitchAttempt,
+  roleSwitchSuccess,
+  roleSwitchFailure,
 } from './auth.actions';
 import { initialAuthState } from './auth.state';
 
@@ -34,6 +36,7 @@ export const authReducer = createReducer(
     currentUser: null,
     currentRole: null,
     organization: null,
+    accessToken: null,
     isLoading: false,
     error,
   })),
@@ -49,10 +52,27 @@ export const authReducer = createReducer(
     ...initialAuthState,
   })),
 
-  // Mock Role Switch Action
-  on(switchRole, (state, { role }) => ({
+  // Role Switch Actions
+  on(roleSwitchAttempt, (state) => ({
     ...state,
+    isLoading: true,
+    error: null,
+  })),
+
+  on(roleSwitchSuccess, (state, { accessToken, user, role, organization }) => ({
+    ...state,
+    currentUser: user,
     currentRole: role,
+    organization,
+    accessToken,
+    isLoading: false,
+    error: null,
+  })),
+
+  on(roleSwitchFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    error,
   })),
 
   // Clear Error

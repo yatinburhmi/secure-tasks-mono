@@ -14,7 +14,7 @@ export interface LoginResponse {
 }
 
 // Expected structure of the JWT payload from our backend
-interface DecodedJwtPayload {
+export interface DecodedJwtPayload {
   sub: string; // User ID
   email: string;
   roleId: number;
@@ -137,8 +137,11 @@ export class AuthService {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
   }
 
-  public switchRole(newRole: RoleType): void {
-    this.store.dispatch(AuthActions.switchRole({ role: newRole }));
+  public switchRole(newRoleId: number): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/switch-role`, {
+      newRoleId,
+    });
+    // The NgRx effect will handle the response (saving token, decoding, dispatching success/failure)
   }
 
   public isAuthenticatedSync(): boolean {

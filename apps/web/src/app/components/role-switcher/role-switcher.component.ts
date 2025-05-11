@@ -3,10 +3,22 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { RoleType } from '@secure-tasks-mono/data';
-import { AuthService } from '../../services/auth.service';
 import { RootState } from '../../store';
-import { selectCurrentRole } from '../../store/auth/auth.selectors';
+import {
+  selectCurrentRole,
+  selectAuthLoading,
+} from '../../store/auth/auth.selectors';
+import * as AuthActions from '../../store/auth/auth.actions';
+import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
+
+// Helper to map RoleType enum to numeric ID
+// This should ideally align with backend Role IDs
+const roleTypeToIdMap: Record<RoleType, number> = {
+  [RoleType.OWNER]: 1,
+  [RoleType.ADMIN]: 2,
+  [RoleType.VIEWER]: 3, // Assuming Viewer is 3 based on previous map
+};
 
 @Component({
   selector: 'app-role-switcher',
@@ -16,8 +28,8 @@ import { take } from 'rxjs/operators';
   styleUrls: ['./role-switcher.component.css'],
 })
 export class RoleSwitcherComponent implements OnInit {
-  private readonly authService = inject(AuthService);
   private readonly store = inject(Store<RootState>);
+  public isLoading$: Observable<boolean>;
 
   public availableRoles: RoleType[] = [
     RoleType.OWNER,
@@ -25,6 +37,10 @@ export class RoleSwitcherComponent implements OnInit {
     RoleType.VIEWER,
   ];
   public selectedRole: RoleType = RoleType.VIEWER;
+
+  constructor() {
+    this.isLoading$ = this.store.select(selectAuthLoading);
+  }
 
   ngOnInit(): void {
     this.store
@@ -39,9 +55,16 @@ export class RoleSwitcherComponent implements OnInit {
 
   /**
    * Handles role change event from the select element
-   * Dispatches the switchRole action via AuthService
+   * Dispatches the roleSwitchAttempt action with the numeric newRoleId
    */
-  public handleRoleChange(newRole: RoleType): void {
-    this.authService.switchRole(newRole);
+  public handleRoleChange(newRoleType: RoleType): void {
+    const newRoleId = roleTypeToIdMap[newRoleType];
+    if (newRoleId === undefined) {
+      console.error(
+        `[RoleSwitcherComponent] Unknown RoleType selected: ${newRoleType}`
+      );
+      return;
+    }
+    this.store.dispatch(AuthActions.roleSwitchAttempt({ newRoleId }));
   }
 }

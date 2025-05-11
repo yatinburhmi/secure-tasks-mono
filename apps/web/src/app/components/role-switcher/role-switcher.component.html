@@ -3,6 +3,7 @@
     id="role-select"
     [(ngModel)]="selectedRole"
     (ngModelChange)="handleRoleChange($event)"
+    [disabled]="(isLoading$ | async) ?? false"
     class="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm font-medium px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 w-auto"
     aria-label="Select user role"
   >

@@ -25,10 +25,25 @@ export const loginFailure = createAction(
 export const logout = createAction('[Auth] Logout');
 export const logoutSuccess = createAction('[Auth] Logout Success');
 
-// Mock Role Switch Actions (for development)
-export const switchRole = createAction(
-  '[Auth] Switch Role',
-  props<{ role: RoleType }>()
+// Role Switch Actions
+export const roleSwitchAttempt = createAction(
+  '[Auth API] Role Switch Attempt',
+  props<{ newRoleId: number }>()
+);
+
+export const roleSwitchSuccess = createAction(
+  '[Auth API] Role Switch Success',
+  props<{
+    accessToken: string;
+    user: UserDto;
+    role: RoleType;
+    organization: OrganizationDto;
+  }>()
+);
+
+export const roleSwitchFailure = createAction(
+  '[Auth API] Role Switch Failure',
+  props<{ error: any }>()
 );
 
 // Clear Error Action
