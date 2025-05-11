@@ -9,6 +9,15 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Enable CORS
+  app.enableCors({
+    origin: '*', // Allows all origins - for development. Restrict in production.
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Accept, Authorization', // Crucial for JWT
+    // credentials: true, // Set to true if you need to handle cookies or specific auth schemes
+  });
+
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 

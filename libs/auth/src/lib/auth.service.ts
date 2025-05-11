@@ -35,11 +35,11 @@ export class AuthService {
     //   const { passwordHash, ...result } = user; // Don't return hash
     //   return result;
     // }
-    console.warn(
-      'AuthService.validateUserByPassword is a stub. Needs UsersService integration.',
-      email, // Prevent unused var error
-      pass // Prevent unused var error
-    );
+    // console.warn(
+    //   'AuthService.validateUserByPassword is a stub. Needs UsersService integration.',
+    //   email, // Prevent unused var error
+    //   pass // Prevent unused var error
+    // );
     return null;
   }
 

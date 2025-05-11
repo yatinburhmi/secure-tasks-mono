@@ -1,22 +1,50 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { UserDto, OrganizationDto, RoleType } from '@secure-tasks-mono/data';
 import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
-import { RootState } from '../store';
 import * as AuthActions from '../store/auth/auth.actions';
+import { jwtDecode } from 'jwt-decode';
 
+// Matches the backend response for /auth/login
 export interface LoginResponse {
-  user: UserDto;
   accessToken: string;
 }
 
-export interface AuthResponse {
-  user: UserDto;
-  role: RoleType;
-  organization: OrganizationDto;
+// Expected structure of the JWT payload from our backend
+interface DecodedJwtPayload {
+  sub: string; // User ID
+  email: string;
+  roleId: number;
+  organizationId: string;
+  iat?: number;
+  exp?: number;
+}
+
+const ACCESS_TOKEN_KEY = 'accessToken';
+
+// Helper to map roleId from token to RoleType enum
+function mapRoleIdToRoleType(roleId: number): RoleType {
+  switch (roleId) {
+    case 1:
+      return RoleType.OWNER;
+    case 2:
+      return RoleType.ADMIN;
+    // Assuming roleId 3 (if it exists in backend JWTs) should map to VIEWER
+    // Or, if your backend doesn't issue roleId 3, this case might not be needed.
+    case 3:
+      console.warn(
+        `RoleId 3 encountered, mapping to VIEWER. Adjust if this is incorrect.`
+      );
+      return RoleType.VIEWER;
+    case 4:
+      return RoleType.VIEWER;
+    default:
+      console.warn(`Unknown roleId: ${roleId}, defaulting to VIEWER`);
+      return RoleType.VIEWER;
+  }
 }
 
 @Injectable({
@@ -24,43 +52,96 @@ export interface AuthResponse {
 })
 export class AuthService {
   private readonly apiUrl = environment.apiUrl;
-  private readonly store = inject(Store<RootState>);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private store: Store) {}
 
-  login(username: string, password: string): Observable<AuthResponse> {
+  login(email: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/auth/login`, { username, password })
+      .post<LoginResponse>(`${this.apiUrl}/auth/login`, { email, password })
       .pipe(
-        map((response) => {
-          // Store the token
-          localStorage.setItem('accessToken', response.accessToken);
+        tap((response) => {
+          if (!response || !response.accessToken) {
+            console.error('Login response missing access token.');
+            this.store.dispatch(
+              AuthActions.loginFailure({
+                error: 'Login failed: No access token received.',
+              })
+            );
+            throw new Error('Login failed: No access token received.');
+          }
+          localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
+          try {
+            const decodedToken = jwtDecode<DecodedJwtPayload>(
+              response.accessToken
+            );
 
-          // Mock response for now - this should come from the API
-          return {
-            user: response.user,
-            role: 'ADMIN' as RoleType, // Mock role
-            organization: {
-              id: '1',
-              name: 'Default Organization',
+            const user: UserDto = {
+              id: decodedToken.sub,
+              email: decodedToken.email,
+              name: decodedToken.email,
+              // isActive: true, // Removed as it's not in UserDto
+              roleId: decodedToken.roleId,
+              organizationId: decodedToken.organizationId,
               createdAt: new Date(),
               updatedAt: new Date(),
-            },
-          };
+              // roles: [], // Removed as UserDto might not have it, and role is handled separately
+            };
+
+            const role = mapRoleIdToRoleType(decodedToken.roleId);
+
+            const organization: OrganizationDto = {
+              id: decodedToken.organizationId,
+              name: `Org ${decodedToken.organizationId}`,
+              parentOrganizationId: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            this.store.dispatch(
+              AuthActions.loginSuccess({ user, role, organization })
+            );
+          } catch (error) {
+            console.error(
+              'Error decoding token or dispatching loginSuccess:',
+              error
+            );
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            this.store.dispatch(
+              AuthActions.loginFailure({
+                error: 'Invalid token received from server. Please try again.',
+              })
+            );
+            throw new Error('Login failed due to an invalid token.');
+          }
+        }),
+        catchError((err) => {
+          localStorage.removeItem(ACCESS_TOKEN_KEY);
+          const errorMessage =
+            err.error?.message ||
+            err.message ||
+            'An unknown login error occurred.';
+          this.store.dispatch(
+            AuthActions.loginFailure({ error: errorMessage })
+          );
+          return throwError(() => new Error(errorMessage));
         })
       );
   }
 
-  logout(): Observable<void> {
-    return new Observable((subscriber) => {
-      localStorage.removeItem('accessToken');
-      subscriber.next();
-      subscriber.complete();
-    });
+  logout(): void {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    this.store.dispatch(AuthActions.logoutSuccess());
   }
 
-  // For development only - now dispatches to NgRx store
+  getToken(): string | null {
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  }
+
   public switchRole(newRole: RoleType): void {
     this.store.dispatch(AuthActions.switchRole({ role: newRole }));
+  }
+
+  public isAuthenticatedSync(): boolean {
+    return !!this.getToken();
   }
 }

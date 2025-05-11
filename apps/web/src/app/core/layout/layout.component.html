@@ -1,49 +1,56 @@
 <div class="flex flex-col min-h-screen bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-  <!-- Header -->
-  <header class="bg-white dark:bg-gray-800 shadow-md">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <!-- Logo -->
-        <div class="flex-shrink-0">
-          <a routerLink="/" class="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            TaskManager
-          </a>
-        </div>
+  <!-- Header: Conditionally rendered -->
+  <ng-container *ngIf="isAuthenticated$ | async">
+    <header class="bg-white dark:bg-gray-800 shadow-md">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo -->
+          <div class="flex-shrink-0">
+            <a routerLink="/" class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              TaskManager
+            </a>
+          </div>
 
-        <!-- Navigation & Role Switcher -->
-        <div class="flex items-center">
-          <nav class="hidden md:flex space-x-4">
-            <a routerLink="/dashboard"
-               routerLinkActive="text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-gray-700"
-               [routerLinkActiveOptions]="{exact: true}"
-               class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-2 rounded-md text-sm font-medium">
-              Dashboard
-            </a>
-            <a routerLink="/my-tasks"
-               routerLinkActive="text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-gray-700"
-               class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-2 rounded-md text-sm font-medium">
-              My Tasks
-            </a>
-          </nav>
-          <div class="ml-4">
-            <app-role-switcher></app-role-switcher>
+          <!-- Navigation, Role Switcher, Theme Toggle & Logout -->
+          <div class="flex items-center">
+            <nav class="hidden md:flex space-x-4">
+              <a routerLink="/dashboard"
+                 routerLinkActive="text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-gray-700"
+                 [routerLinkActiveOptions]="{exact: true}"
+                 class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-2 rounded-md text-sm font-medium">
+                Dashboard
+              </a>
+              <a routerLink="/my-tasks"
+                 routerLinkActive="text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-gray-700"
+                 class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-2 rounded-md text-sm font-medium">
+                My Tasks
+              </a>
+            </nav>
+            <div class="ml-4">
+              <app-role-switcher></app-role-switcher>
+            </div>
+            <div class="ml-3">
+              <app-theme-toggle></app-theme-toggle>
+            </div>
+            <div class="ml-3">
+              <button (click)="handleLogout()" 
+                      class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150">
+                Logout
+              </button>
+            </div>
           </div>
-          <div class="ml-3">
-            <app-theme-toggle></app-theme-toggle>
-          </div>
-          <!-- Mobile menu button (placeholder for future if needed) -->
-          <!-- Dark mode toggle will be added later -->
         </div>
       </div>
-    </div>
-  </header>
+    </header>
+  </ng-container>
 
   <!-- Main Content -->
   <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <router-outlet></router-outlet>
   </main>
 
-  <!-- Footer (Optional) -->
+  <!-- Footer (Optional - also conditionally rendered or styled differently if needed) -->
+  <!-- For now, footer remains. If it should also be hidden, wrap it in the same ng-container -->
   <footer class="bg-white dark:bg-gray-800 mt-auto py-4 border-t border-gray-200 dark:border-gray-700">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500 dark:text-gray-400">
       &copy; 2025 TaskManager. All rights reserved.
