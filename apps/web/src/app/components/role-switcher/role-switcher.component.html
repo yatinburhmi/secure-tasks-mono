@@ -1,14 +1,13 @@
 <div class="role-switcher">
-  <label for="role-select" class="mr-2 text-sm font-medium text-gray-700 dark:text-gray-300">Role:</label>
   <select
     id="role-select"
     [(ngModel)]="selectedRole"
     (ngModelChange)="handleRoleChange($event)"
-    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+    class="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm font-medium px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 w-auto"
     aria-label="Select user role"
   >
     <option *ngFor="let role of availableRoles" [ngValue]="role">
-      {{ role }}
+      Role: {{ role }}
     </option>
   </select>
 </div> 
