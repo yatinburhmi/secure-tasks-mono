@@ -17,7 +17,7 @@ export const loadTasksFailure = createAction(
 // Create Task
 export const createTask = createAction(
   '[Tasks] Create Task',
-  props<{ task: Omit<TaskDto, 'id'> }>()
+  props<{ taskData: Omit<TaskDto, 'id' | 'createdAt' | 'updatedAt'> }>()
 );
 
 export const createTaskSuccess = createAction(

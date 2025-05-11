@@ -1,35 +1,28 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, exhaustMap, catchError, concatMap } from 'rxjs/operators';
-import { TasksService } from '../../services/tasks.service';
-import {
-  loadTasks,
-  loadTasksSuccess,
-  loadTasksFailure,
-  createTask,
-  createTaskSuccess,
-  createTaskFailure,
-  updateTask,
-  updateTaskSuccess,
-  updateTaskFailure,
-  deleteTask,
-  deleteTaskSuccess,
-  deleteTaskFailure,
-} from './tasks.actions';
+import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
+import { TasksHttpService } from '../../core/services/tasks-http.service';
+import * as TasksActions from './tasks.actions';
 
 @Injectable()
 export class TasksEffects {
   private readonly actions$ = inject(Actions);
-  private readonly tasksService = inject(TasksService);
+  private readonly tasksHttpService = inject(TasksHttpService);
 
   readonly loadTasks$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loadTasks),
-      exhaustMap(() =>
-        this.tasksService.getAllTasks().pipe(
-          map((tasks) => loadTasksSuccess({ tasks })),
-          catchError((error) => of(loadTasksFailure({ error: error.message })))
+      ofType(TasksActions.loadTasks),
+      switchMap(() =>
+        this.tasksHttpService.getTasks().pipe(
+          map((tasks) => TasksActions.loadTasksSuccess({ tasks })),
+          catchError((error) =>
+            of(
+              TasksActions.loadTasksFailure({
+                error: error.message || 'Failed to load tasks',
+              })
+            )
+          )
         )
       )
     )
@@ -37,11 +30,17 @@ export class TasksEffects {
 
   readonly createTask$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(createTask),
-      concatMap(({ task }) =>
-        this.tasksService.createTask(task).pipe(
-          map((createdTask) => createTaskSuccess({ task: createdTask })),
-          catchError((error) => of(createTaskFailure({ error: error.message })))
+      ofType(TasksActions.createTask),
+      mergeMap((action) =>
+        this.tasksHttpService.createTask(action.taskData).pipe(
+          map((task) => TasksActions.createTaskSuccess({ task })),
+          catchError((error) =>
+            of(
+              TasksActions.createTaskFailure({
+                error: error.message || 'Failed to create task',
+              })
+            )
+          )
         )
       )
     )
@@ -49,11 +48,17 @@ export class TasksEffects {
 
   readonly updateTask$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(updateTask),
-      concatMap(({ id, changes }) =>
-        this.tasksService.updateTask(id, changes).pipe(
-          map((updatedTask) => updateTaskSuccess({ task: updatedTask })),
-          catchError((error) => of(updateTaskFailure({ error: error.message })))
+      ofType(TasksActions.updateTask),
+      mergeMap((action) =>
+        this.tasksHttpService.updateTask(action.id, action.changes).pipe(
+          map((task) => TasksActions.updateTaskSuccess({ task })),
+          catchError((error) =>
+            of(
+              TasksActions.updateTaskFailure({
+                error: error.message || 'Failed to update task',
+              })
+            )
+          )
         )
       )
     )
@@ -61,11 +66,19 @@ export class TasksEffects {
 
   readonly deleteTask$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(deleteTask),
-      concatMap(({ id }) =>
-        this.tasksService.deleteTask(id).pipe(
-          map(() => deleteTaskSuccess({ id })),
-          catchError((error) => of(deleteTaskFailure({ error: error.message })))
+      ofType(TasksActions.deleteTask),
+      mergeMap((action) =>
+        this.tasksHttpService.deleteTask(action.id).pipe(
+          map((response) =>
+            TasksActions.deleteTaskSuccess({ id: response.id })
+          ),
+          catchError((error) =>
+            of(
+              TasksActions.deleteTaskFailure({
+                error: error.message || 'Failed to delete task',
+              })
+            )
+          )
         )
       )
     )

@@ -33,8 +33,13 @@ export class TasksBackendService {
     createTaskDto: CreateTaskDto,
     userId: string
   ): Promise<Task> {
-    const { organizationId, assigneeId, status, ...coreTaskProperties } =
-      createTaskDto;
+    const {
+      organizationId,
+      assigneeId,
+      status,
+      dueDate,
+      ...coreTaskProperties
+    } = createTaskDto;
 
     if (!organizationId) {
       this.logger.error('Organization ID is missing in CreateTaskDto');
@@ -49,6 +54,17 @@ export class TasksBackendService {
 
     if (assigneeId) {
       taskDataForCreate.assignee = { id: assigneeId } as User;
+    }
+
+    if (dueDate) {
+      const parsedDueDate = new Date(dueDate);
+      if (!isNaN(parsedDueDate.getTime())) {
+        taskDataForCreate.dueDate = parsedDueDate;
+      } else {
+        this.logger.warn(
+          `Invalid dueDate string received: ${dueDate}. Skipping dueDate assignment.`
+        );
+      }
     }
 
     const taskEntityInstance = this.taskRepository.create(taskDataForCreate);
@@ -123,8 +139,29 @@ export class TasksBackendService {
   ): Promise<Task> {
     const task = await this.findTaskById(id, organizationId); // Ensures task exists and belongs to org
 
+    // Destructure dueDate and get the rest of the properties
+    const { dueDate, ...coreUpdateProperties } = updateTaskDto;
+
+    // Initialize updatePayload with properties other than dueDate
+    const updatePayload: Partial<Task> = {
+      ...coreUpdateProperties,
+    };
+
+    // Handle dueDate conversion if it exists in the DTO
+    if (dueDate) {
+      const parsedDueDate = new Date(dueDate);
+      if (!isNaN(parsedDueDate.getTime())) {
+        updatePayload.dueDate = parsedDueDate; // Assign Date object
+      } else {
+        this.logger.warn(
+          `Invalid dueDate string received for update: ${dueDate}. Skipping dueDate update.`
+        );
+        // No need to delete updatePayload.dueDate as it was never set with the string from DTO
+      }
+    }
+
     // Merge and save. TypeORM handles partial updates.
-    this.taskRepository.merge(task, updateTaskDto);
+    this.taskRepository.merge(task, updatePayload); // Use the processed updatePayload
     const updatedTask = await this.taskRepository.save(task);
 
     // Audit log call
@@ -135,7 +172,7 @@ export class TasksBackendService {
         action: AUDIT_TASK_UPDATED,
         details: {
           taskId: updatedTask.id,
-          updatedFields: Object.keys(updateTaskDto),
+          updatedFields: Object.keys(updateTaskDto), // Log original DTO keys for clarity
         },
       })
       .catch((err) =>

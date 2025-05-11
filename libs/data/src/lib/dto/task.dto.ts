@@ -5,7 +5,6 @@ import {
   IsEnum,
   IsOptional,
   IsUUID,
-  IsDate,
   IsArray,
   ArrayMaxSize,
   Length,
@@ -13,7 +12,6 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 // Placeholder: Will import relations later when defined
 // import { UserDto } from './user.dto';
 // import { OrganizationDto } from './organization.dto';
@@ -40,9 +38,8 @@ export class TaskDto {
   category?: string | null;
 
   @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  dueDate?: Date | null;
+  @IsString()
+  dueDate?: string | null;
 
   // Assuming creatorId is a UUID string linking to a User entity
   @IsUUID()
@@ -66,13 +63,11 @@ export class TaskDto {
   // assignee?: UserDto;
   // organization?: OrganizationDto;
 
-  @Type(() => Date)
-  @IsDate()
-  createdAt!: Date;
+  @IsString()
+  createdAt!: string;
 
-  @Type(() => Date)
-  @IsDate()
-  updatedAt!: Date;
+  @IsString()
+  updatedAt!: string;
 }
 
 export class CreateTaskDto {
@@ -97,9 +92,8 @@ export class CreateTaskDto {
   priority?: number; // e.g., 1 (Highest) to 5 (Lowest)
 
   @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  dueDate?: Date;
+  @IsString()
+  dueDate?: string;
 
   @IsOptional()
   @IsUUID()
@@ -145,9 +139,8 @@ export class UpdateTaskDto {
   priority?: number;
 
   @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  dueDate?: Date;
+  @IsString()
+  dueDate?: string;
 
   @IsOptional()
   @IsUUID()
