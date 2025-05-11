@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@secure-tasks-mono/database'; // Assuming User entity is exported
 import { CreateUserDto, UpdateUserDto } from '@secure-tasks-mono/data';
-import { PasswordService } from '@secure-tasks-mono/auth';
+import { PasswordService } from '@secure-tasks-mono/security';
 
 @Injectable()
 export class UsersBackendService {
@@ -43,6 +43,21 @@ export class UsersBackendService {
     });
 
     return this.userRepository.save(newUser);
+  }
+
+  /**
+   * Finds a user by their email, ensuring the password hash is included.
+   * This method is specifically for authentication purposes.
+   * @param email - The email of the user to find.
+   * @returns A promise that resolves to the user if found (with password hash), otherwise null.
+   */
+  public async findOneByEmailIncludingPasswordHash(
+    email: string
+  ): Promise<User | null> {
+    // Standard findOneBy should include passwordHash as it's not marked with { select: false }
+    // If issues arise, use queryBuilder with .addSelect('user.passwordHash')
+    const user = await this.userRepository.findOneBy({ email });
+    return user; // Returns user or null if not found
   }
 
   /**
@@ -83,18 +98,24 @@ export class UsersBackendService {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
 
-    const { email, password, name, roleId, organizationId } = updateUserDto;
+    const {
+      email: newEmail,
+      password,
+      name,
+      roleId,
+      organizationId,
+    } = updateUserDto; // Renamed email to newEmail to avoid conflict
 
-    if (email) {
+    if (newEmail) {
       const existingUserWithNewEmail = await this.userRepository.findOne({
-        where: { email },
+        where: { email: newEmail }, // Use newEmail here
       });
       if (existingUserWithNewEmail && existingUserWithNewEmail.id !== id) {
         throw new ConflictException(
           'Another user with this email already exists'
         );
       }
-      user.email = email;
+      user.email = newEmail;
     }
     if (roleId !== undefined) {
       user.roleId = roleId;
