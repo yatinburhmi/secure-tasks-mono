@@ -87,7 +87,7 @@
       <!-- Task List View -->
       <div *ngIf="listTasks.length > 0; else noListTasks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <app-task-card 
-          *ngFor="let task of listTasks" 
+          *ngFor="let task of listTasks; trackBy: taskTrackByFn" 
           [task]="task" 
           [viewContext]="'list'" 
           (editClicked)="openEditTaskModal($event)"
@@ -105,52 +105,73 @@
     </div>
     <ng-template #boardView>
       <!-- Board View -->
-      <div *ngIf="currentView === 'board'" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div *ngIf="currentView === 'board'" cdkDropListGroup class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Pending Tasks Column -->
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow">
           <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">Pending ({{ pendingTasks.length }})</h3>
-          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1">
+          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1"
+               cdkDropList
+               [id]="TaskStatusEnum.PENDING"
+               [cdkDropListData]="pendingTasks"
+               [cdkDropListConnectedTo]="[TaskStatusEnum.IN_PROGRESS, TaskStatusEnum.DONE]"
+               (cdkDropListDropped)="drop($event)">
             <div *ngIf="pendingTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No pending tasks.
             </div>
             <app-task-card 
-              *ngFor="let task of pendingTasks" 
+              *ngFor="let task of pendingTasks; trackBy: taskTrackByFn" 
               [task]="task" 
               [viewContext]="'board'" 
               (editClicked)="openEditTaskModal($event)"
-              (deleteRequested)="requestTaskDelete($event)"></app-task-card>
+              (deleteRequested)="requestTaskDelete($event)"
+              cdkDrag
+              [cdkDragData]="task"></app-task-card>
           </div>
         </div>
 
         <!-- In Progress Tasks Column -->
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow">
           <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">In Progress ({{ inProgressTasks.length }})</h3>
-          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1">
+          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1"
+               cdkDropList
+               [id]="TaskStatusEnum.IN_PROGRESS"
+               [cdkDropListData]="inProgressTasks"
+               [cdkDropListConnectedTo]="[TaskStatusEnum.PENDING, TaskStatusEnum.DONE]"
+               (cdkDropListDropped)="drop($event)">
             <div *ngIf="inProgressTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks in progress.
             </div>
             <app-task-card 
-              *ngFor="let task of inProgressTasks" 
+              *ngFor="let task of inProgressTasks; trackBy: taskTrackByFn" 
               [task]="task" 
               [viewContext]="'board'" 
               (editClicked)="openEditTaskModal($event)"
-              (deleteRequested)="requestTaskDelete($event)"></app-task-card>
+              (deleteRequested)="requestTaskDelete($event)"
+              cdkDrag
+              [cdkDragData]="task"></app-task-card>
           </div>
         </div>
 
         <!-- Done Tasks Column -->
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow">
           <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">Done ({{ doneTasks.length }})</h3>
-          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1">
+          <div class="column-task-list space-y-3 h-[calc(100vh-18rem)] overflow-y-auto p-1"
+               cdkDropList
+               [id]="TaskStatusEnum.DONE"
+               [cdkDropListData]="doneTasks"
+               [cdkDropListConnectedTo]="[TaskStatusEnum.PENDING, TaskStatusEnum.IN_PROGRESS]"
+               (cdkDropListDropped)="drop($event)">
             <div *ngIf="doneTasks.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
               No tasks done.
             </div>
             <app-task-card 
-              *ngFor="let task of doneTasks" 
+              *ngFor="let task of doneTasks; trackBy: taskTrackByFn" 
               [task]="task" 
               [viewContext]="'board'" 
               (editClicked)="openEditTaskModal($event)"
-              (deleteRequested)="requestTaskDelete($event)"></app-task-card>
+              (deleteRequested)="requestTaskDelete($event)"
+              cdkDrag
+              [cdkDragData]="task"></app-task-card>
           </div>
         </div>
       </div>

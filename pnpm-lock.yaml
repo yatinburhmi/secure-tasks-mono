@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@angular/cdk':
+        specifier: ^19.2.15
+        version: 19.2.15(@angular/common@19.2.10(@angular/core@19.2.10(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@19.2.10(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
       '@angular/common':
         specifier: ~19.2.0
         version: 19.2.10(@angular/core@19.2.10(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
@@ -453,6 +456,13 @@ packages:
         optional: true
       tailwindcss:
         optional: true
+
+  '@angular/cdk@19.2.15':
+    resolution: {integrity: sha512-srM0O4oVPvMIbv1m+fU3D0X2ZK0Q7raggCD7jcb+d+pXoPESqI91Hn8FIhA2OCbw0vJWJ/Mly8lskmIb8RNLcQ==}
+    peerDependencies:
+      '@angular/common': ^19.0.0 || ^20.0.0
+      '@angular/core': ^19.0.0 || ^20.0.0
+      rxjs: ^6.5.3 || ^7.4.0
 
   '@angular/cli@19.2.11':
     resolution: {integrity: sha512-U+Sapv4S1v+LEywyCImhQf12c6vmhuJhBS58nBxWDUVn1kmYzdUCAKNDDgMQqWQmg/Dek1YI88XYDToUvEdD1g==}
@@ -9520,6 +9530,14 @@ snapshots:
       - terser
       - tsx
       - yaml
+
+  '@angular/cdk@19.2.15(@angular/common@19.2.10(@angular/core@19.2.10(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@19.2.10(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/common': 19.2.10(@angular/core@19.2.10(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+      '@angular/core': 19.2.10(rxjs@7.8.2)(zone.js@0.15.0)
+      parse5: 7.3.0
+      rxjs: 7.8.2
+      tslib: 2.8.1
 
   '@angular/cli@19.2.11(@types/node@22.15.17)':
     dependencies:

@@ -40,6 +40,12 @@ import {
   selectOrganization,
   selectCurrentUser,
 } from '../../../../store/auth/auth.selectors';
+import {
+  DragDropModule,
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -51,6 +57,7 @@ import {
     ModalComponent,
     TaskFormComponent,
     ConfirmationDialogComponent,
+    DragDropModule,
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
@@ -58,6 +65,8 @@ import {
 export class DashboardPageComponent implements OnInit, OnDestroy {
   pageTitle = 'Task Management';
   currentView: 'list' | 'board' = 'list';
+
+  public TaskStatusEnum = TaskStatus;
 
   statusFilters: string[] = ['All', ...Object.values(TaskStatus)];
   selectedStatusFilter = 'All';
@@ -313,5 +322,41 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   public clearSearch(): void {
     this.searchControl.setValue('');
+  }
+
+  public drop(event: CdkDragDrop<TaskDto[]>): void {
+    if (this.currentView !== 'board') {
+      return;
+    }
+
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+      const taskToUpdate = event.container.data[event.currentIndex];
+      const newStatus = event.container.id as TaskStatus;
+
+      if (taskToUpdate && newStatus && taskToUpdate.status !== newStatus) {
+        this.store.dispatch(
+          TasksActions.updateTask({
+            id: taskToUpdate.id,
+            changes: { status: newStatus },
+          })
+        );
+      }
+    }
+  }
+
+  public taskTrackByFn(index: number, item: TaskDto): string {
+    return item.id;
   }
 }
