@@ -12,10 +12,14 @@ describe('AppController', () => {
     }).compile();
   });
 
-  describe('getData', () => {
-    it('should return "Hello API"', () => {
+  describe('healthCheck', () => {
+    it('should return a health check object with status, message, and timestamp', () => {
       const appController = app.get<AppController>(AppController);
-      expect(appController.getData()).toEqual({ message: 'Hello API' });
+      const healthResponse = appController.healthCheck();
+      expect(healthResponse).toHaveProperty('status', 'success');
+      expect(healthResponse).toHaveProperty('message', 'API is healthy');
+      expect(healthResponse).toHaveProperty('timestamp');
+      expect(typeof healthResponse.timestamp).toBe('string'); // Check if timestamp is a string (ISO date)
     });
   });
 });
