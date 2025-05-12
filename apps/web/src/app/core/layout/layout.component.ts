@@ -4,11 +4,11 @@ import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { RoleSwitcherComponent } from '../../components/role-switcher/role-switcher.component';
+import { RoleSwitcherComponent } from '../../features/role-switcher/role-switcher.component';
 import { ThemeToggleComponent } from '../components/theme-toggle/theme-toggle.component';
 import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
 import { AuthState } from '../../store/auth/auth.state';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-layout',

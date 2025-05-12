@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { TasksService } from '../../services/tasks.service';
+import { TasksService } from '../../core/services/tasks.service';
 import { TasksHttpService } from '../../core/services/tasks-http.service';
 import * as TasksActions from './tasks.actions';
 import * as AuthActions from '../../store/auth/auth.actions';

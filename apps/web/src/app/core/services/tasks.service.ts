@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { TaskDto } from '@secure-tasks-mono/data';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { AuthService, DecodedJwtPayload } from './auth.service';
 import { jwtDecode } from 'jwt-decode';
 

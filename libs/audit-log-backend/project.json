@@ -3,7 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/audit-log-backend/src",
   "projectType": "library",
-  "buildable": true,
   "tags": ["type:lib"],
   "targets": {
     "build": {

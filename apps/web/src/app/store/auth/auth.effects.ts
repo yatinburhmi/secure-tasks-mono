@@ -3,9 +3,12 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of, EMPTY } from 'rxjs';
 import { switchMap, catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import * as AuthActions from './auth.actions';
-import { LoginResponse, DecodedJwtPayload } from '../../services/auth.service';
+import {
+  LoginResponse,
+  DecodedJwtPayload,
+} from '../../core/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { UserDto, OrganizationDto, RoleType } from '@secure-tasks-mono/data';
 

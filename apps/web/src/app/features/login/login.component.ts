@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 // import * as AuthActions from '../../store/auth/auth.actions'; // We will use this later
-import { AuthService } from '../../services/auth.service'; // Uncommented
+import { AuthService } from '../../core/services/auth.service'; // Uncommented
 
 @Component({
   selector: 'app-login',

@@ -12,7 +12,7 @@ import {
 import { TaskCardComponent } from '../../components/task-card/task-card.component';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
-import { TaskFormComponent } from '../../../../components/tasks/task-form/task-form.component';
+import { TaskFormComponent } from '../../components/tasks/task-form/task-form.component';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import {

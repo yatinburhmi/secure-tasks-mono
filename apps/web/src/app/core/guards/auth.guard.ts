@@ -8,8 +8,7 @@ import {
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
-import { AuthState } from '../store/auth/auth.state';
-import { selectIsAuthenticated } from '../store/auth/auth.selectors'; // We will create this selector
+import { AuthState } from '../../store';
 
 // Functional guard approach for Angular 15+
 export const authGuard: CanActivateFn = (
