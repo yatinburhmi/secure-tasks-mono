@@ -13,8 +13,10 @@
 
           <!-- Navigation, Role Switcher, Theme Toggle & Logout -->
           <div class="flex items-center">
-            <nav class="hidden md:flex space-x-4">
-              <!--
+            <!-- Desktop Menu Items -->
+            <div class="hidden md:flex items-center">
+              <nav class="hidden md:flex space-x-4">
+                <!--
               <a routerLink="/dashboard"
                  routerLinkActive="text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-gray-700"
                  [routerLinkActiveOptions]="{exact: true}"
@@ -27,20 +29,57 @@
                 My Tasks
               </a>
               -->
-            </nav>
-            <div class="ml-4">
-              <app-role-switcher></app-role-switcher>
+              </nav>
+              <div class="ml-4">
+                <app-role-switcher></app-role-switcher>
+              </div>
+              <div class="ml-3">
+                <app-theme-toggle></app-theme-toggle>
+              </div>
+              <div class="ml-3">
+                <button (click)="handleLogout()" 
+                        class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150">
+                  Logout
+                </button>
+              </div>
             </div>
-            <div class="ml-3">
-              <app-theme-toggle></app-theme-toggle>
-            </div>
-            <div class="ml-3">
-              <button (click)="handleLogout()" 
-                      class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150">
-                Logout
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+              <button (click)="toggleMobileMenu()" type="button"
+                      class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+                      aria-controls="mobile-menu" [attr.aria-expanded]="isMobileMenuOpen">
+                <span class="sr-only">Open main menu</span>
+                <!-- Heroicon name: outline/menu, show when menu is closed -->
+                <svg [class.hidden]="isMobileMenuOpen" [class.block]="!isMobileMenuOpen" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+                <!-- Heroicon name: outline/x, show when menu is open -->
+                <svg [class.hidden]="!isMobileMenuOpen" [class.block]="isMobileMenuOpen" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu, show/hide based on menu state -->
+      <div class="md:hidden" id="mobile-menu" *ngIf="isMobileMenuOpen">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-800 shadow-lg">
+          <!-- Mobile Role Switcher -->
+          <div class="w-full flex justify-center items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-600 dark:hover:text-purple-400">
+             <app-role-switcher></app-role-switcher>
+          </div>
+          <!-- Mobile Theme Toggle -->
+          <div class="w-full flex justify-center items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-600 dark:hover:text-purple-400">
+            <app-theme-toggle></app-theme-toggle>
+          </div>
+          <!-- Mobile Logout -->
+          <button (click)="handleLogoutAndCloseMenu()" 
+                  class="w-full text-center block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-600 dark:hover:text-purple-400">
+            Logout
+          </button>
         </div>
       </div>
     </header>

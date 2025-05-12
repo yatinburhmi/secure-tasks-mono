@@ -25,6 +25,7 @@ import { AuthService } from '../../services/auth.service';
 export class LayoutComponent implements OnDestroy {
   isAuthenticated$: Observable<boolean>;
   isOnLoginPage = false;
+  isMobileMenuOpen = false; // Property to control mobile menu visibility
   private routerSubscription: Subscription;
 
   constructor(
@@ -50,11 +51,20 @@ export class LayoutComponent implements OnDestroy {
       });
   }
 
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
   handleLogout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
     // Note: AuthEffects also navigates to /login on logoutSuccess action.
     // This component-level navigation provides immediate feedback.
+  }
+
+  handleLogoutAndCloseMenu(): void {
+    this.handleLogout();
+    this.isMobileMenuOpen = false; // Close menu after logout
   }
 
   ngOnDestroy(): void {
