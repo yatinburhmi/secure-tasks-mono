@@ -64,7 +64,7 @@ import {
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
   pageTitle = 'Task Management';
-  currentView: 'list' | 'board' = 'list';
+  currentView: 'list' | 'board' = 'board';
 
   public TaskStatusEnum = TaskStatus;
 
@@ -102,6 +102,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   constructor(private store: Store<RootState>) {}
 
   ngOnInit(): void {
+    this.pageTitle =
+      this.currentView === 'board' ? 'Task Board' : 'Task Management';
     this.store.dispatch(TasksActions.loadTasks({ queryParams: {} }));
 
     this.allTasks$ = this.store.select(selectAllTasks);
@@ -200,6 +202,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.pageTitle = view === 'board' ? 'Task Board' : 'Task Management';
     if (view === 'list') {
       this._updateListTasks();
+    } else {
+      this._filterTasksByStatus();
     }
   }
 

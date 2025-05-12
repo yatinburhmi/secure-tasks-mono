@@ -31,24 +31,24 @@
       <!-- View Toggle Buttons -->
       <div class="inline-flex rounded-md shadow-sm bg-white dark:bg-gray-700" role="group">
         <button type="button"
-                (click)="setView('list')"
-                [ngClass]="{
-                  'bg-purple-600 text-white dark:bg-purple-500': currentView === 'list',
-                  'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600': currentView !== 'list'
-                }"
-                class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 dark:border-gray-600 focus:z-10 focus:ring-2 focus:ring-purple-500 focus:text-purple-700 dark:focus:text-white">
-          <svg class="w-5 h-5 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-          List
-        </button>
-        <button type="button"
                 (click)="setView('board')"
                 [ngClass]="{
                   'bg-purple-600 text-white dark:bg-purple-500': currentView === 'board',
                   'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600': currentView !== 'board'
                 }"
-                class="px-4 py-2 text-sm font-medium rounded-r-lg border-t border-b border-r border-gray-200 dark:border-gray-600 focus:z-10 focus:ring-2 focus:ring-purple-500 focus:text-purple-700 dark:focus:text-white">
+                class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 dark:border-gray-600 focus:z-10 focus:ring-2 focus:ring-purple-500 focus:text-purple-700 dark:focus:text-white">
           <svg class="w-5 h-5 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 3a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H3a1 1 0 01-1-1V3zm0 8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H3a1 1 0 01-1-1v-4zm8-8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V3zm0 8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path></svg>
           Board
+        </button>
+        <button type="button"
+                (click)="setView('list')"
+                [ngClass]="{
+                  'bg-purple-600 text-white dark:bg-purple-500': currentView === 'list',
+                  'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600': currentView !== 'list'
+                }"
+                class="px-4 py-2 text-sm font-medium rounded-r-lg border-t border-b border-r border-gray-200 dark:border-gray-600 focus:z-10 focus:ring-2 focus:ring-purple-500 focus:text-purple-700 dark:focus:text-white">
+          <svg class="w-5 h-5 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+          List
         </button>
       </div>
       <!-- New Task Button -->
