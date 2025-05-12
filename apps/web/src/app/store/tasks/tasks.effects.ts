@@ -72,8 +72,21 @@ export class TasksEffects {
   readonly loadTasks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TasksActions.loadTasks, AuthActions.roleSwitchSuccess),
-      switchMap(() =>
-        this.tasksService.getAllTasks().pipe(
+      switchMap((action) => {
+        let searchTerm: string | undefined = undefined;
+
+        // Check if the action is loadTasks and has queryParams
+        if (action.type === TasksActions.loadTasks.type) {
+          // Type assertion is safe here because we've checked action.type
+          const loadTasksAction = action as ReturnType<
+            typeof TasksActions.loadTasks
+          >;
+          searchTerm = loadTasksAction.queryParams?.searchTerm;
+        }
+        // For AuthActions.roleSwitchSuccess, searchTerm remains undefined (or its default),
+        // which is the desired behavior to reload all tasks for the new role without a search term.
+
+        return this.tasksService.getAllTasks(searchTerm).pipe(
           map((tasks) => TasksActions.loadTasksSuccess({ tasks })),
           catchError((error) =>
             of(
@@ -82,8 +95,8 @@ export class TasksEffects {
               })
             )
           )
-        )
-      )
+        );
+      })
     )
   );
 

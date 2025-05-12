@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
   TaskDto,
   TaskStatus,
@@ -14,7 +15,13 @@ import { ConfirmationDialogComponent } from '../../../../shared/components/confi
 import { TaskFormComponent } from '../../../../components/tasks/task-form/task-form.component';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription, combineLatest } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  tap,
+} from 'rxjs/operators';
 import { RootState } from '../../../../store';
 import * as TasksActions from '../../../../store/tasks/tasks.actions';
 import * as UsersActions from '../../../../store/users/users.actions';
@@ -39,6 +46,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     TaskCardComponent,
     ModalComponent,
     TaskFormComponent,
@@ -76,8 +84,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   private currentUserId: string | null = null;
   private subscriptions = new Subscription();
 
-  // Add a property to control New Task button visibility
   public canCreateTasks = false;
+  public searchControl = new FormControl('');
 
   @ViewChild(ConfirmationDialogComponent)
   private deleteConfirmDialog!: ConfirmationDialogComponent;
@@ -85,7 +93,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   constructor(private store: Store<RootState>) {}
 
   ngOnInit(): void {
-    this.store.dispatch(TasksActions.loadTasks());
+    this.store.dispatch(TasksActions.loadTasks({ queryParams: {} }));
 
     this.allTasks$ = this.store.select(selectAllTasks);
     this.isLoading$ = this.store.select(selectTasksLoading);
@@ -121,20 +129,33 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     const userSubscription = this.store
       .pipe(
         select(selectCurrentUser),
-        // Add tap for debugging if needed
-        // tap(user => console.log('[DashboardPage] Current user from store:', user)),
-        filter((user): user is UserDto => !!user) // Ensure user is not null
+        filter((user): user is UserDto => !!user)
       )
       .subscribe((user: UserDto) => {
         this.currentUserId = user.id;
-        // Set canCreateTasks based on roleId
         if (typeof user.roleId === 'number') {
-          this.canCreateTasks = user.roleId === 1 || user.roleId === 2; // Owner or Admin
+          this.canCreateTasks = user.roleId === 1 || user.roleId === 2;
         } else {
-          this.canCreateTasks = false; // Default if roleId is missing or not a number
+          this.canCreateTasks = false;
         }
       });
     this.subscriptions.add(userSubscription);
+
+    const searchSubscription = this.searchControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap((term) => console.log('[DashboardSearch] Term:', term))
+      )
+      .subscribe((term) => {
+        const searchTerm = term?.trim();
+        this.store.dispatch(
+          TasksActions.loadTasks({
+            queryParams: { searchTerm: searchTerm ? searchTerm : undefined },
+          })
+        );
+      });
+    this.subscriptions.add(searchSubscription);
 
     this.statusFilters = ['All', ...Object.values(TaskStatus)];
   }
@@ -288,5 +309,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   public cancelTaskDelete(): void {
     this.taskToDelete = null;
+  }
+
+  public clearSearch(): void {
+    this.searchControl.setValue('');
   }
 }

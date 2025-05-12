@@ -69,9 +69,9 @@ export class TasksController {
   @Get()
   public async findAllTasks(
     @Req() req: { user: JwtPayload },
-    @Query() query: FindAllTasksQueryDto // Use the DTO for query parameters
+    @Query() query: FindAllTasksQueryDto
   ): Promise<TaskDto[]> {
-    const user = req.user; // user is JwtPayload
+    const user = req.user;
 
     const filters: FindAllTasksFiltersDto = {};
     if (query.assigneeId) {
@@ -80,16 +80,21 @@ export class TasksController {
 
     const tasks = await this.tasksBackendService.findAllTasks(
       user.organizationId,
-      filters
+      filters,
+      query.searchTerm
     );
     return tasks as unknown as TaskDto[];
   }
 
   @Get('all-organizations')
   @RequirePermissions(PERM_TASK_VIEW_ALL_ORGS)
-  public async findAllTasksForOwner(): Promise<TaskDto[]> {
+  public async findAllTasksAcrossOrganizations(
+    @Query() query: FindAllTasksQueryDto
+  ): Promise<TaskDto[]> {
     const tasks =
-      await this.tasksBackendService.findAllTasksAcrossOrganizations();
+      await this.tasksBackendService.findAllTasksAcrossOrganizations(
+        query.searchTerm
+      );
     return tasks as unknown as TaskDto[];
   }
 

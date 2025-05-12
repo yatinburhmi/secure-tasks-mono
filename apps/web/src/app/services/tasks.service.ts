@@ -15,7 +15,7 @@ export class TasksService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  getAllTasks(): Observable<TaskDto[]> {
+  getAllTasks(searchTerm?: string): Observable<TaskDto[]> {
     const token = this.authService.getToken();
     if (!token) {
       console.error('No token found, cannot fetch tasks with RBAC.');
@@ -34,6 +34,10 @@ export class TasksService {
         requestUrl = `${this.apiUrl}/all-organizations`;
       } else if (roleId === 3) {
         params = params.set('assigneeId', userId);
+      }
+
+      if (searchTerm && searchTerm.trim() !== '') {
+        params = params.set('searchTerm', searchTerm.trim());
       }
 
       return this.http.get<TaskDto[]>(requestUrl, { params });

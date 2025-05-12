@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { Task, User, Organization } from '@secure-tasks-mono/database';
 import {
   CreateTaskDto,
@@ -94,40 +94,92 @@ export class TasksBackendService {
    * Finds all tasks for a given organization, with optional filters.
    * @param organizationId - The organization's UUID.
    * @param filters - Optional filters (e.g., status, assigneeId).
+   * @param searchTerm - Optional term for searching tasks.
    */
   public async findAllTasks(
     organizationId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    filters?: FindAllTasksFiltersDto // Use the new DTO
+    filters?: FindAllTasksFiltersDto,
+    searchTerm?: string
   ): Promise<Task[]> {
-    // Construct the where clause dynamically
-    const whereClause: any = { organizationId }; // Start with organizationId
+    const queryBuilder = this.taskRepository.createQueryBuilder('task');
+
+    queryBuilder
+      .leftJoinAndSelect('task.assignee', 'assigneeUser')
+      .leftJoinAndSelect('task.creator', 'creatorUser')
+      .leftJoinAndSelect('task.organization', 'organizationDetails')
+      .where('task.organizationId = :organizationId', { organizationId });
 
     if (filters?.assigneeId) {
-      whereClause.assigneeId = filters.assigneeId; // Add assigneeId if present
+      queryBuilder.andWhere('task.assigneeId = :assigneeId', {
+        assigneeId: filters.assigneeId,
+      });
     }
 
-    return this.taskRepository.find({
-      where: whereClause, // Use the dynamically constructed where clause
-      // Add relations to load if needed: 'assignee', 'creator', 'organization'
-      // Add order by, e.g., { createdAt: 'DESC' }
-      relations: ['assignee', 'creator', 'organization'], // Eager load relations
-      order: { createdAt: 'DESC' }, // Default ordering
-    });
+    if (searchTerm && searchTerm.trim().length > 0) {
+      const trimmedSearchTerm = searchTerm.trim();
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(task.title) LIKE LOWER(:searchTerm)', {
+            searchTerm: `%${trimmedSearchTerm}%`,
+          })
+            .orWhere('LOWER(task.category) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${trimmedSearchTerm}%`,
+            })
+            .orWhere('LOWER(assigneeUser.name) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${trimmedSearchTerm}%`,
+            })
+            .orWhere('LOWER(assigneeUser.email) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${trimmedSearchTerm}%`,
+            });
+        })
+      );
+    }
+
+    queryBuilder.orderBy('task.createdAt', 'DESC');
+    return queryBuilder.getMany();
   }
 
   /**
    * Finds all tasks across all organizations. Intended for Owner-level access.
+   * @param searchTerm - Optional term for searching tasks.
    */
-  public async findAllTasksAcrossOrganizations(): Promise<Task[]> {
+  public async findAllTasksAcrossOrganizations(
+    searchTerm?: string
+  ): Promise<Task[]> {
     this.logger.debug(
-      'Fetching all tasks across all organizations for Owner role'
+      `Fetching all tasks across all organizations ${
+        searchTerm ? 'with search term: ' + searchTerm : ''
+      }`
     );
-    return this.taskRepository.find({
-      // No organizationId filter here
-      relations: ['assignee', 'creator', 'organization'], // Eager load relations
-      order: { createdAt: 'DESC' }, // Default ordering
-    });
+    const queryBuilder = this.taskRepository.createQueryBuilder('task');
+
+    queryBuilder
+      .leftJoinAndSelect('task.assignee', 'assigneeUser')
+      .leftJoinAndSelect('task.creator', 'creatorUser')
+      .leftJoinAndSelect('task.organization', 'organizationDetails');
+
+    if (searchTerm && searchTerm.trim().length > 0) {
+      const trimmedSearchTerm = searchTerm.trim();
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(task.title) LIKE LOWER(:searchTerm)', {
+            searchTerm: `%${trimmedSearchTerm}%`,
+          })
+            .orWhere('LOWER(task.category) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${trimmedSearchTerm}%`,
+            })
+            .orWhere('LOWER(assigneeUser.name) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${trimmedSearchTerm}%`,
+            })
+            .orWhere('LOWER(assigneeUser.email) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${trimmedSearchTerm}%`,
+            });
+        })
+      );
+    }
+
+    queryBuilder.orderBy('task.createdAt', 'DESC');
+    return queryBuilder.getMany();
   }
 
   /**
