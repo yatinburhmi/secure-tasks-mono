@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserDto } from '@secure-tasks-mono/data';
-import { environment } from '../../../environments/environment'; // Import environment
+import { environment } from '../../../environments/environment.prod'; // Import environment
 
 @Injectable({
   providedIn: 'root',

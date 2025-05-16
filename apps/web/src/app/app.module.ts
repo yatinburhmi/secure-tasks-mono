@@ -6,7 +6,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.prod';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { rootReducer, rootEffects } from './store';
